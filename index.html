@@ -100,6 +100,10 @@
             h2 {
                 font-size: 24px;
             }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         .accordion-container {
@@ -147,13 +151,71 @@
         .accordion-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease;
+            transition: max-height 0.5s ease;
             background-color: #f0f7ff;
         }
         
         .accordion-content.active {
-            max-height: 500px;
-            padding: 20px;
+            max-height: 2000px;
+            padding: 30px;
+        }
+        
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .resource-card {
+            background-color: white;
+            border: 3px solid #0066cc;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 102, 204, 0.3);
+            border-color: #0052a3;
+        }
+        
+        .card-link {
+            display: block;
+            text-decoration: none;
+            color: #333;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .card-link:focus {
+            outline: 4px solid #0066cc;
+            outline-offset: 2px;
+        }
+        
+        .card-image {
+            color: #0066cc;
+            margin-bottom: 15px;
+        }
+        
+        .card-text h3 {
+            font-size: 20px;
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+        
+        .card-text p {
+            font-size: 16px;
+            color: #666;
+            margin: 0;
+        }
+        
+        .resource-card:hover .card-image {
+            color: #0052a3;
+        }
+        
+        .resource-card:hover .card-text h3 {
+            color: #0052a3;
         }
     </style>
 </head>
@@ -182,34 +244,202 @@
         
         <section id="resources">
             <h2>Resources</h2>
-            <p>Click on any heading below to view more information.</p>
+            <p>Click on any heading below to view helpful resources and links.</p>
             
             <div class="accordion-container">
                 <div class="accordion-item">
-                    <button class="accordion-header">Getting Started Guide</button>
+                    <button class="accordion-header">Cyber Security Guidance</button>
                     <div class="accordion-content">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante.</p>
+                        <div class="cards-grid">
+                            <div class="resource-card">
+                                <a href="https://www.ncsc.gov.uk/section/advice-guidance/you-your-family" class="card-link" target="_blank">
+                                    <div class="card-image">
+                                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="card-text">
+                                        <h3>NCSC Family Guidance</h3>
+                                        <p>Trusted cyber security advice from the National Cyber Security Centre</p>
+                                    </div>
+                                </a>
+                            </div>
+                            
+                            <div class="resource-card">
+                                <a href="https://haveibeenpwned.com" class="card-link" target="_blank">
+                                    <div class="card-image">
+                                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                            <polyline points="22,6 12,13 2,6"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div class="card-text">
+                                        <h3>Check Email Breaches</h3>
+                                        <p>Find out if your email has been exposed in a data breach</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="accordion-item">
-                    <button class="accordion-header">Helpful Tips</button>
+                    <button class="accordion-header">Scams & Fraud</button>
                     <div class="accordion-content">
-                        <p>Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra.</p>
+                        <div class="cards-grid">
+                            <div class="resource-card">
+                                <a href="https://www.which.co.uk/news/scams-fraud" class="card-link" target="_blank">
+                                    <div class="card-image">
+                                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                        </svg>
+                                    </div>
+                                    <div class="card-text">
+                                        <h3>Which? Scam News</h3>
+                                        <p>Latest news about scams and fraud</p>
+                                    </div>
+                                </a>
+                            </div>
+                            
+                            <div class="resource-card">
+                                <a href="https://www.actionfraud.police.uk/sign-up-for-action-fraud-alert" class="card-link" target="_blank">
+                                    <div class="card-image">
+                                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                        </svg>
+                                    </div>
+                                    <div class="card-text">
+                                        <h3>Action Fraud Alerts</h3>
+                                        <p>Sign up for free scam alerts in your area</p>
+                                    </div>
+                                </a>
+                            </div>
+                            
+                            <div class="resource-card">
+                                <a href="https://signup.which.co.uk/wlp-scamalert-newsletter" class="card-link" target="_blank">
+                                    <div class="card-image">
+                                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="card-text">
+                                        <h3>Which? Scam Alerts</h3>
+                                        <p>Free scam alert newsletter service</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="accordion-item">
-                    <button class="accordion-header">Frequently Asked Questions</button>
+                    <button class="accordion-header">Fact-Checking Resources</button>
                     <div class="accordion-content">
-                        <p>Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.</p>
+                        <div class="cards-grid">
+                            <div class="resource-card">
+                                <a href="https://fullfact.org" class="card-link" target="_blank">
+                                    <div class="card-image">
+                                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="9 11 12 14 22 4"></polyline>
+                                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="card-text">
+                                        <h3>Full Fact</h3>
+                                        <p>Check claims you see online and in the news</p>
+                                    </div>
+                                </a>
+                            </div>
+                            
+                            <div class="resource-card">
+                                <a href="https://www.bbc.co.uk/news/bbcverify" class="card-link" target="_blank">
+                                    <div class="card-image">
+                                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                    </div>
+                                    <div class="card-text">
+                                        <h3>BBC Verify</h3>
+                                        <p>BBC's fact-checking and verification service</p>
+                                    </div>
+                                </a>
+                            </div>
+                            
+                            <div class="resource-card">
+                                <a href="https://www.channel4.com/news/factcheck" class="card-link" target="_blank">
+                                    <div class="card-image">
+                                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        </svg>
+                                    </div>
+                                    <div class="card-text">
+                                        <h3>Channel 4 Fact Check</h3>
+                                        <p>Independent fact-checking from Channel 4</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="accordion-item">
-                    <button class="accordion-header">Additional Resources</button>
+                    <button class="accordion-header">Media Literacy & Trusted News</button>
                     <div class="accordion-content">
-                        <p>Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim.</p>
+                        <div class="cards-grid">
+                            <div class="resource-card">
+                                <a href="https://theguardianfoundation.org/programmes/newswise/families" class="card-link" target="_blank">
+                                    <div class="card-image">
+                                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="card-text">
+                                        <h3>NewsWise for Families</h3>
+                                        <p>Media literacy resources from The Guardian Foundation</p>
+                                    </div>
+                                </a>
+                            </div>
+                            
+                            <div class="resource-card">
+                                <a href="https://www.bbc.co.uk/news" class="card-link" target="_blank">
+                                    <div class="card-image">
+                                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                            <polyline points="17 2 12 7 7 2"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div class="card-text">
+                                        <h3>BBC News</h3>
+                                        <p>Trusted world and UK news coverage</p>
+                                    </div>
+                                </a>
+                            </div>
+                            
+                            <div class="resource-card">
+                                <a href="https://www.itv.com/news" class="card-link" target="_blank">
+                                    <div class="card-image">
+                                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="card-text">
+                                        <h3>ITV News</h3>
+                                        <p>Breaking news on regional and national level</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -248,14 +478,11 @@
                 const content = this.nextElementSibling;
                 const isActive = this.classList.contains('active');
                 
-                // Close all accordion items
-                accordionHeaders.forEach(h => {
-                    h.classList.remove('active');
-                    h.nextElementSibling.classList.remove('active');
-                });
-                
-                // Open clicked item if it wasn't already open
-                if (!isActive) {
+                // Toggle clicked item
+                if (isActive) {
+                    this.classList.remove('active');
+                    content.classList.remove('active');
+                } else {
                     this.classList.add('active');
                     content.classList.add('active');
                 }
