@@ -25,6 +25,17 @@
             padding: 20px 0;
         }
         
+        .logo {
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 20px;
+        }
+        
+        .logo svg {
+            width: 100%;
+            height: auto;
+        }
+        
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -103,6 +114,10 @@
             
             .cards-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .logo {
+                max-width: 350px;
             }
         }
         
@@ -222,7 +237,9 @@
 <body>
     <header>
         <div class="container">
-            <h1>Welcome</h1>
+            <div class="logo">
+                <img src="/ImageAssets/CG_White_Transparent.png" alt="CyberGuardians">
+            </div>
             <nav>
                 <ul>
                     <li><a href="#home">Home</a></li>
