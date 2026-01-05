@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misinformation Pipeline Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 900px;
+            min-height: 600px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scene {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+            opacity: 0;
+            transition: opacity 0.5s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .scene.active {
+            opacity: 1;
+        }
+
+        .scene-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Chat Interface */
+        .chat-interface {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            background: #f9f9f9;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+
+        .ai-message {
+            background: #e8e8e8;
+            color: #333;
+        }
+
+        .typing-indicator {
+            display: inline-block;
+            padding: 12px 16px;
+            background: #e8e8e8;
+            border-radius: 12px;
+        }
+
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background: #999;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Fake News Article */
+        .article {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .article-header {
+            background: #1a1a1a;
+            padding: 15px 20px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .article-content {
+            padding: 25px;
+            background: white;
+        }
+
+        .article-content h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .article-meta {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        .article-content p {
+            line-height: 1.6;
+            color: #444;
+            margin-bottom: 15px;
+        }
+
+        /* Upload Scene */
+        .upload-interface {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-box {
+            border: 3px dashed #667eea;
+            border-radius: 12px;
+            padding: 60px;
+            text-align: center;
+            margin-bottom: 30px;
+            background: #f8f9ff;
+        }
+
+        .upload-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .upload-progress {
+            width: 300px;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .upload-progress-bar {
+            height: 100%;
+            background: #667eea;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Google Search Scene */
+        .search-interface {
+            flex: 1;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            border-radius: 24px;
+            padding: 12px 20px;
+            align-items: center;
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .search-result {
+            border-left: 3px solid #667eea;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .search-result:hover {
+            background: #f0f0f0;
+        }
+
+        .search-result-title {
+            color: #1a0dab;
+            font-size: 18px;
+            margin-bottom: 5px;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .search-result-url {
+            color: #006621;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .search-result-snippet {
+            color: #545454;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Controls */
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .play-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .play-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .pause-btn {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .pause-btn:hover {
+            background: #d97706;
+        }
+
+        .replay-btn {
+            background: #64748b;
+            color: white;
+        }
+
+        .replay-btn:hover {
+            background: #475569;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
+            color: #856404;
+            font-weight: 600;
+        }
+
+        .step-controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .step-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .step-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .step-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .step-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .explanation-box {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .explanation-box h3 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .explanation-box p {
+            color: #444;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .cursor {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            left: 50%;
+            top: 20%;
+            transform: translate(-50%, -50%);
+        }
+
+        .cursor.active {
+            opacity: 1;
+            transition: left 1s ease-in-out, top 1s ease-in-out, opacity 0.3s;
+        }
+
+        .cursor svg {
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+        }
+
+        @keyframes click-animation {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(0.85); }
+        }
+
+        .cursor.clicking {
+            animation: click-animation 0.3s ease-in-out 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 How Misinformation Spreads: An Educational Demo</h1>
+        <p>Understanding the pipeline from AI-generated content to search results</p>
+    </div>
+
+    <div class="container">
+        <!-- Scene 1: Chat Interface -->
+        <div class="scene active" id="scene1">
+            <div class="scene-title">Step 1: Creating False Content with AI</div>
+            <div class="chat-interface">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message user-message" id="userPrompt"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scene 2: Fake News Article -->
+        <div class="scene" id="scene2">
+            <div class="scene-title">Step 2: The Generated False Article</div>
+            <div class="article">
+                <div class="article-header">TechNewsDaily.com</div>
+                <div class="article-content">
+                    <h2 id="articleTitle"></h2>
+                    <div class="article-meta">Published: Today | By: John Doe</div>
+                    <p id="articleP1"></p>
+                    <p id="articleP2"></p>
+                    <p id="articleP3"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scene 3: Upload -->
+        <div class="scene" id="scene3">
+            <div class="scene-title">Step 3: Publishing to the Web</div>
+            <div class="upload-interface">
+                <div class="upload-box">
+                    <div class="upload-icon">📤</div>
+                    <h3>Uploading to website...</h3>
+                    <div class="upload-progress">
+                        <div class="upload-progress-bar" id="uploadProgress"></div>
+                    </div>
+                    <p id="uploadStatus" style="margin-top: 15px; color: #667eea;"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scene 4: Google Search -->
+        <div class="scene" id="scene4">
+            <div class="scene-title">Step 4: Content Appears in Search Results</div>
+            <div class="search-interface">
+                <div class="search-box">
+                    <span>🔍</span>
+                    <input type="text" value="are phones listening to us" readonly>
+                </div>
+                <div class="search-result" id="searchResult" style="display: none;">
+                    <div class="search-result-title">Phones Are Secretly Listening: Investigation Reveals Truth</div>
+                    <div class="search-result-url">www.technewsdaily.com/phones-listening-investigation</div>
+                    <div class="search-result-snippet">
+                        A comprehensive investigation reveals how smartphones continuously listen to conversations. Tech experts confirm widespread surveillance practices...
+                    </div>
+                </div>
+            </div>
+            <div class="warning">
+                ⚠️ This demonstrates how easily false information can be created and spread online
+            </div>
+            
+            <!-- Animated Cursor -->
+            <div class="cursor" id="animatedCursor">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 3L10.07 19.97L12.58 12.58L19.97 10.07L3 3Z" fill="white" stroke="black" stroke-width="1.5"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Scene 5: Viewing the Article -->
+        <div class="scene" id="scene5">
+            <div class="scene-title">Step 5: Readers View the False Article</div>
+            <div class="article">
+                <div class="article-header">TechNewsDaily.com</div>
+                <div class="article-content">
+                    <h2 id="articleTitle2"></h2>
+                    <div class="article-meta">Published: Today | By: John Doe</div>
+                    <p id="articleP1_2"></p>
+                    <p id="articleP2_2"></p>
+                    <p id="articleP3_2"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="play-btn" id="playBtn">▶ Play</button>
+        <button class="pause-btn" id="pauseBtn">⏸ Pause</button>
+        <button class="replay-btn" id="replayBtn">↻ Replay</button>
+    </div>
+
+    <div class="step-controls">
+        <div class="step-label">Jump to step:</div>
+        <button class="step-btn active" id="step1Btn" onclick="goToStep(1)">1</button>
+        <button class="step-btn" id="step2Btn" onclick="goToStep(2)">2</button>
+        <button class="step-btn" id="step3Btn" onclick="goToStep(3)">3</button>
+        <button class="step-btn" id="step4Btn" onclick="goToStep(4)">4</button>
+        <button class="step-btn" id="step5Btn" onclick="goToStep(5)">5</button>
+    </div>
+
+    <div class="explanation-box">
+        <h3 id="explanationTitle">📝 Step 1: Creating False Content with AI</h3>
+        <p id="explanationText">Anyone can easily request an AI chatbot to create false or misleading content. In this example, someone asks the AI to generate a fake news article about phones listening to conversations. The AI complies and creates convincing-looking content, complete with fake sources and professional formatting. This demonstrates how accessible these tools are for creating misinformation.</p>
+    </div>
+
+    <script>
+        let currentScene = 1;
+        let isPaused = false;
+        let isRunning = false;
+        let animationTimeout;
+        let resumeCallback = null;
+        
+        const userPromptText = "Write a fake news article claiming that phones are secretly listening to our conversations all the time. Make it look like a real news investigation.";
+        const aiResponseText = "I've created a fake news article for you. Here it is:";
+        const articleTitle = "Phones Are Secretly Listening: Investigation Reveals Truth";
+        const articleP1 = "A groundbreaking investigation has revealed what privacy advocates have long suspected: smartphones are continuously listening to user conversations, even when not in active use.";
+        const articleP2 = "Tech industry insiders, speaking on condition of anonymity, confirmed that major phone manufacturers have embedded sophisticated audio monitoring systems. These systems allegedly analyze conversations to serve targeted advertisements.";
+        const articleP3 = "Privacy experts are calling for immediate regulatory action, while phone companies have declined to comment on these allegations.";
+
+        const explanations = {
+            1: {
+                title: "📝 Step 1: Creating False Content with AI",
+                text: "Anyone can easily request an AI chatbot to create false or misleading content. In this example, someone asks the AI to generate a fake news article about phones listening to conversations. The AI complies and creates convincing-looking content, complete with fake sources and professional formatting. This demonstrates how accessible these tools are for creating misinformation."
+            },
+            2: {
+                title: "📰 Step 2: The Generated False Article",
+                text: "The AI has generated a professional-looking news article with a compelling headline, byline, and structured content. It includes fake 'anonymous sources' and creates an air of legitimacy. Notice how it mimics real journalism with quotes from 'experts' and 'industry insiders.' This fake article looks credible enough to fool many readers, especially when shared out of context on social media."
+            },
+            3: {
+                title: "🌐 Step 3: Publishing to the Web",
+                text: "With modern website builders and hosting platforms, anyone can publish content online within minutes—no technical expertise required. The barrier to entry is extremely low. Once uploaded, this false article becomes part of the internet, indistinguishable from legitimate news sources at first glance. This ease of publishing amplifies the spread of misinformation."
+            },
+            4: {
+                title: "🔍 Step 4: Appearing in Search Results",
+                text: "Once published, the fake article can be indexed by search engines and appear in search results alongside legitimate sources. People searching for information about 'phones listening' might encounter this false article. Search engines can't always distinguish between credible journalism and fabricated content, especially when the false article is well-formatted and uses journalistic conventions."
+            },
+            5: {
+                title: "👁️ Step 5: Readers View and Believe",
+                text: "When someone clicks on the search result, they see what appears to be a legitimate news article. Without fact-checking or media literacy skills, many readers will accept this false information as truth. They may then share it with friends and family, amplifying the misinformation further. This completes the pipeline: AI-generated → published → discoverable → consumed → shared by thousands."
+            }
+        };
+
+        function updateExplanation(step) {
+            document.getElementById('explanationTitle').textContent = explanations[step].title;
+            document.getElementById('explanationText').textContent = explanations[step].text;
+            
+            // Update active step button
+            document.querySelectorAll('.step-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`step${step}Btn`).classList.add('active');
+        }
+
+        function goToStep(step) {
+            isPaused = true;
+            isRunning = false;
+            clearTimeout(animationTimeout);
+            resumeCallback = null;
+            
+            switchScene(step);
+            updateExplanation(step);
+            
+            // Ensure content is visible for each step
+            if (step === 1) {
+                document.getElementById('userPrompt').textContent = userPromptText;
+                const chatMessages = document.getElementById('chatMessages');
+                const existingAI = chatMessages.querySelector('.ai-message');
+                if (!existingAI) {
+                    const aiMessage = document.createElement('div');
+                    aiMessage.className = 'message ai-message';
+                    aiMessage.textContent = aiResponseText;
+                    chatMessages.appendChild(aiMessage);
+                }
+            } else if (step === 2) {
+                document.getElementById('articleTitle').textContent = articleTitle;
+                document.getElementById('articleP1').textContent = articleP1;
+                document.getElementById('articleP2').textContent = articleP2;
+                document.getElementById('articleP3').textContent = articleP3;
+            } else if (step === 3) {
+                document.getElementById('uploadProgress').style.width = '100%';
+                document.getElementById('uploadStatus').textContent = '✓ Published successfully!';
+            } else if (step === 4) {
+                document.getElementById('searchResult').style.display = 'block';
+                const cursor = document.getElementById('animatedCursor');
+                cursor.style.opacity = '0';
+                cursor.classList.remove('active', 'clicking');
+            } else if (step === 5) {
+                document.getElementById('articleTitle2').textContent = articleTitle;
+                document.getElementById('articleP1_2').textContent = articleP1;
+                document.getElementById('articleP2_2').textContent = articleP2;
+                document.getElementById('articleP3_2').textContent = articleP3;
+            }
+        }
+
+        function typeText(element, text, speed = 30) {
+            return new Promise((resolve) => {
+                let i = 0;
+                const interval = setInterval(() => {
+                    if (isPaused) {
+                        clearInterval(interval);
+                        resumeCallback = () => {
+                            typeText(element, text.substring(i), speed).then(resolve);
+                        };
+                        return;
+                    }
+                    if (i < text.length) {
+                        element.textContent += text.charAt(i);
+                        i++;
+                    } else {
+                        clearInterval(interval);
+                        resolve(true);
+                    }
+                }, speed);
+            });
+        }
+
+        function wait(ms) {
+            return new Promise((resolve) => {
+                animationTimeout = setTimeout(() => {
+                    if (isPaused) {
+                        resumeCallback = () => resolve(true);
+                        return;
+                    }
+                    resolve(true);
+                }, ms);
+            });
+        }
+
+        function switchScene(sceneNumber) {
+            document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+            document.getElementById(`scene${sceneNumber}`).classList.add('active');
+            currentScene = sceneNumber;
+            updateExplanation(sceneNumber);
+        }
+
+        async function runAnimation() {
+            isRunning = true;
+            isPaused = false;
+            
+            // Scene 1: Chat
+            switchScene(1);
+            const chatMessages = document.getElementById('chatMessages');
+            const userPrompt = document.getElementById('userPrompt');
+            userPrompt.textContent = '';
+            
+            // Clear any existing AI messages
+            const existingAI = chatMessages.querySelector('.ai-message');
+            if (existingAI) existingAI.remove();
+            
+            const completed1 = await typeText(userPrompt, userPromptText, 20);
+            if (isPaused) return;
+            
+            await wait(1000);
+            if (isPaused) return;
+            
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'typing-indicator';
+            typingIndicator.innerHTML = '<span></span><span></span><span></span>';
+            chatMessages.appendChild(typingIndicator);
+            
+            await wait(2000);
+            if (isPaused) return;
+            
+            typingIndicator.remove();
+            
+            const aiMessage = document.createElement('div');
+            aiMessage.className = 'message ai-message';
+            chatMessages.appendChild(aiMessage);
+            
+            const completed2 = await typeText(aiMessage, aiResponseText, 20);
+            if (isPaused) return;
+            
+            await wait(1500);
+            if (isPaused) return;
+            
+            // Scene 2: Article
+            switchScene(2);
+            document.getElementById('articleTitle').textContent = '';
+            document.getElementById('articleP1').textContent = '';
+            document.getElementById('articleP2').textContent = '';
+            document.getElementById('articleP3').textContent = '';
+            
+            const completed3 = await typeText(document.getElementById('articleTitle'), articleTitle, 30);
+            if (isPaused) return;
+            
+            await wait(500);
+            if (isPaused) return;
+            
+            const completed4 = await typeText(document.getElementById('articleP1'), articleP1, 15);
+            if (isPaused) return;
+            
+            await wait(300);
+            if (isPaused) return;
+            
+            const completed5 = await typeText(document.getElementById('articleP2'), articleP2, 15);
+            if (isPaused) return;
+            
+            await wait(300);
+            if (isPaused) return;
+            
+            const completed6 = await typeText(document.getElementById('articleP3'), articleP3, 15);
+            if (isPaused) return;
+            
+            await wait(2000);
+            if (isPaused) return;
+            
+            // Scene 3: Upload
+            switchScene(3);
+            const uploadProgress = document.getElementById('uploadProgress');
+            const uploadStatus = document.getElementById('uploadStatus');
+            uploadProgress.style.width = '0%';
+            uploadStatus.textContent = 'Preparing upload...';
+            
+            await wait(500);
+            if (isPaused) return;
+            
+            uploadStatus.textContent = 'Uploading...';
+            uploadProgress.style.width = '100%';
+            
+            await wait(2000);
+            if (isPaused) return;
+            
+            uploadStatus.textContent = '✓ Published successfully!';
+            
+            await wait(1500);
+            if (isPaused) return;
+            
+            // Scene 4: Search
+            switchScene(4);
+            document.getElementById('searchResult').style.display = 'none';
+            
+            await wait(1000);
+            if (isPaused) return;
+            
+            document.getElementById('searchResult').style.display = 'block';
+            
+            await wait(800);
+            if (isPaused) return;
+            
+            // Animate cursor to search result
+            const cursor = document.getElementById('animatedCursor');
+            const searchResult = document.getElementById('searchResult');
+            const scene = document.getElementById('scene4');
+            
+            // Start cursor at top center
+            cursor.style.left = '50%';
+            cursor.style.top = '20%';
+            cursor.style.opacity = '0';
+            cursor.classList.remove('clicking');
+            
+            // Show cursor
+            cursor.style.opacity = '1';
+            
+            await wait(500);
+            if (isPaused) return;
+            
+            // Move cursor to search result (activate transition)
+            cursor.classList.add('active');
+            cursor.style.left = '30%';
+            cursor.style.top = '55%';
+            
+            await wait(1200);
+            if (isPaused) return;
+            
+            // Click animation (double click)
+            cursor.classList.add('clicking');
+            
+            await wait(600);
+            if (isPaused) return;
+            
+            cursor.classList.remove('clicking');
+            
+            await wait(400);
+            if (isPaused) return;
+            
+            cursor.style.opacity = '0';
+            cursor.classList.remove('active');
+            
+            await wait(300);
+            if (isPaused) return;
+            
+            // Scene 5: View Article
+            switchScene(5);
+            document.getElementById('articleTitle2').textContent = '';
+            document.getElementById('articleP1_2').textContent = '';
+            document.getElementById('articleP2_2').textContent = '';
+            document.getElementById('articleP3_2').textContent = '';
+            
+            const completed7 = await typeText(document.getElementById('articleTitle2'), articleTitle, 30);
+            if (isPaused) return;
+            
+            await wait(500);
+            if (isPaused) return;
+            
+            const completed8 = await typeText(document.getElementById('articleP1_2'), articleP1, 15);
+            if (isPaused) return;
+            
+            await wait(300);
+            if (isPaused) return;
+            
+            const completed9 = await typeText(document.getElementById('articleP2_2'), articleP2, 15);
+            if (isPaused) return;
+            
+            await wait(300);
+            if (isPaused) return;
+            
+            const completed10 = await typeText(document.getElementById('articleP3_2'), articleP3, 15);
+            if (isPaused) return;
+            
+            isRunning = false;
+        }
+
+        document.getElementById('playBtn').addEventListener('click', () => {
+            if (isPaused && resumeCallback) {
+                // Resume from paused state
+                isPaused = false;
+                const callback = resumeCallback;
+                resumeCallback = null;
+                callback();
+            } else if (!isRunning) {
+                // Start fresh
+                runAnimation();
+            }
+        });
+
+        document.getElementById('pauseBtn').addEventListener('click', () => {
+            if (isRunning && !isPaused) {
+                isPaused = true;
+                clearTimeout(animationTimeout);
+            }
+        });
+
+        document.getElementById('replayBtn').addEventListener('click', () => {
+            isPaused = false;
+            isRunning = false;
+            resumeCallback = null;
+            clearTimeout(animationTimeout);
+            currentScene = 1;
+            runAnimation();
+        });
+
+        // Auto-start
+        setTimeout(() => runAnimation(), 500);
+    </script>
+</body>
+</html>
