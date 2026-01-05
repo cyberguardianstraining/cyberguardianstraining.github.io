@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Verification Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .explanation-box {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .explanation-box h3 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .explanation-box p {
+            color: #444;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .controls {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .play-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .play-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .pause-btn {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .pause-btn:hover {
+            background: #d97706;
+        }
+
+        .replay-btn {
+            background: #64748b;
+            color: white;
+        }
+
+        .replay-btn:hover {
+            background: #475569;
+        }
+
+        .step-controls {
+            margin-top: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .step-label {
+            font-size: 16px;
+            color: white;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .step-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .step-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .step-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 900px;
+            min-height: 600px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scene {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+            opacity: 0;
+            transition: opacity 0.5s;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .scene.active {
+            opacity: 1;
+        }
+
+        .scene-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Social Media Post */
+        .social-post {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .post-info {
+            flex: 1;
+        }
+
+        .username {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .timestamp {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .post-text {
+            margin-bottom: 15px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .post-image {
+            width: 100%;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            cursor: pointer;
+        }
+
+        .post-image.highlight {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+
+        /* Right-click menu simulation */
+        .context-menu {
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 8px 0;
+            opacity: 0;
+            z-index: 100;
+            min-width: 200px;
+        }
+
+        .context-menu.active {
+            opacity: 1;
+        }
+
+        .context-menu-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .context-menu-item:hover {
+            background: #f0f0f0;
+        }
+
+        .context-menu-item.highlight {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Google Reverse Image Search */
+        .search-interface {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .search-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .google-logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #4285f4;
+        }
+
+        .search-box {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 24px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .search-results {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .result-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .result-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-item.highlight {
+            outline: 3px solid #10b981;
+            outline-offset: 2px;
+        }
+
+        .result-thumbnail {
+            width: 120px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .result-content {
+            flex: 1;
+        }
+
+        .result-title {
+            font-weight: 600;
+            color: #1a0dab;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .result-url {
+            color: #006621;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .result-date {
+            color: #70757a;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .result-snippet {
+            color: #545454;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        /* Original Article */
+        .article-view {
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .article-header {
+            background: #1a1a1a;
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+
+        .article-content {
+            padding: 25px;
+        }
+
+        .article-content h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .article-meta {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .article-image {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .article-text {
+            line-height: 1.6;
+            color: #444;
+        }
+
+        /* Comparison View */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .comparison-side {
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .comparison-side.false {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .comparison-side.true {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .comparison-label {
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .comparison-label.false {
+            color: #dc2626;
+        }
+
+        .comparison-label.true {
+            color: #10b981;
+        }
+
+        .comparison-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .comparison-image {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .comparison-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        /* Cursor */
+        .cursor {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            transform: translate(-50%, -50%);
+        }
+
+        .cursor.active {
+            opacity: 1;
+            transition: left 1s ease-in-out, top 1s ease-in-out, opacity 0.3s;
+        }
+
+        .cursor svg {
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+        }
+
+        @keyframes click-animation {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(0.85); }
+        }
+
+        .cursor.clicking {
+            animation: click-animation 0.3s ease-in-out 2;
+        }
+
+        .start-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(102, 126, 234, 0.95);
+            color: white;
+            padding: 30px 50px;
+            border-radius: 16px;
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            z-index: 100;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+            opacity: 1;
+            transition: opacity 0.5s;
+        }
+
+        .start-message.hidden {
+            opacity: 0;
+        }
+
+        .start-message .arrow {
+            font-size: 32px;
+            margin-top: 10px;
+            animation: bounce-arrow 1.5s infinite;
+        }
+
+        @keyframes bounce-arrow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .checkmark {
+            color: #10b981;
+            font-size: 48px;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 How to Verify Images Online</h1>
+        <p>Learn to check if images are real or taken out of context</p>
+    </div>
+
+    <div class="explanation-box">
+        <h3 id="explanationTitle">📸 Introduction: Why Verify Images?</h3>
+        <p id="explanationText">Images can be misleading - they might be doctored, old photos presented as recent, or real photos used with false context. This demo shows you how to verify images using reverse image search to find the original source and check if claims about an image are true.</p>
+    </div>
+
+    <div class="controls">
+        <button class="play-btn" id="playBtn">▶ Play</button>
+        <button class="pause-btn" id="pauseBtn">⏸ Pause</button>
+        <button class="replay-btn" id="replayBtn">↻ Replay</button>
+    </div>
+
+    <div class="step-controls">
+        <div class="step-label">Jump to step:</div>
+        <button class="step-btn active" id="step1Btn" onclick="goToStep(1)">1</button>
+        <button class="step-btn" id="step2Btn" onclick="goToStep(2)">2</button>
+        <button class="step-btn" id="step3Btn" onclick="goToStep(3)">3</button>
+        <button class="step-btn" id="step4Btn" onclick="goToStep(4)">4</button>
+        <button class="step-btn" id="step5Btn" onclick="goToStep(5)">5</button>
+    </div>
+
+    <div class="container">
+        <div class="start-message" id="startMessage">
+            ▶ Press Play to learn image verification
+            <div class="arrow">↑</div>
+        </div>
+
+        <!-- Scene 1: Suspicious Post -->
+        <div class="scene active" id="scene1">
+            <div class="scene-title">Step 1: A Suspicious Claim</div>
+            <div class="social-post">
+                <div class="post-header">
+                    <div class="avatar">JD</div>
+                    <div class="post-info">
+                        <div class="username">John Doe</div>
+                        <div class="timestamp">2 hours ago</div>
+                    </div>
+                </div>
+                <div class="post-text">
+                    🚨 BREAKING: Massive tornado just hit London city centre! The mainstream media is ignoring this! Share before they delete! 🌪️
+                </div>
+                <img src="https://www.newamerica.org/static/b6f7e83ccdcd26b3e5a14e97fbc7ca55/c1b63/DSC_5322%20copy.png" 
+                     class="post-image" id="suspiciousImage" alt="Tornado">
+            </div>
+        </div>
+
+        <!-- Scene 2: Right-click Menu -->
+        <div class="scene" id="scene2">
+            <div class="scene-title">Step 2: Right-Click to Search</div>
+            <div class="social-post">
+                <div class="post-header">
+                    <div class="avatar">JD</div>
+                    <div class="post-info">
+                        <div class="username">John Doe</div>
+                        <div class="timestamp">2 hours ago</div>
+                    </div>
+                </div>
+                <div class="post-text">
+                    🚨 BREAKING: Massive tornado just hit London city centre! The mainstream media is ignoring this! Share before they delete! 🌪️
+                </div>
+                <img src="https://www.newamerica.org/static/b6f7e83ccdcd26b3e5a14e97fbc7ca55/c1b63/DSC_5322%20copy.png" 
+                     class="post-image highlight" alt="Tornado">
+            </div>
+            <div class="context-menu" id="contextMenu">
+                <div class="context-menu-item">Open image in new tab</div>
+                <div class="context-menu-item">Save image as...</div>
+                <div class="context-menu-item">Copy image</div>
+                <div class="context-menu-item highlight" id="searchMenuItem">🔍 Search image with Google</div>
+            </div>
+        </div>
+
+        <!-- Scene 3: Reverse Image Search -->
+        <div class="scene" id="scene3">
+            <div class="scene-title">Step 3: Check Reverse Image Results</div>
+            <div class="search-interface">
+                <div class="search-header">
+                    <div class="google-logo">Google</div>
+                    <div class="search-box">
+                        <span>🖼️</span>
+                        <input type="text" value="[Image search]" readonly>
+                    </div>
+                </div>
+                <div class="search-results">
+                    <div class="result-item" id="result1">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='80'%3E%3Crect fill='%23555' width='120' height='80'/%3E%3Ctext x='60' y='45' font-family='Arial' font-size='12' fill='%23fff' text-anchor='middle'%3ETornado%3C/text%3E%3C/svg%3E" 
+                             class="result-thumbnail" alt="Result">
+                        <div class="result-content">
+                            <div class="result-title">Oklahoma Tornado - April 2019</div>
+                            <div class="result-url">weathernews.com/oklahoma-tornado-2019</div>
+                            <div class="result-date">Apr 15, 2019</div>
+                            <div class="result-snippet">Devastating EF4 tornado touches down in Oklahoma, causing widespread damage...</div>
+                        </div>
+                    </div>
+                    <div class="result-item">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='80'%3E%3Crect fill='%23555' width='120' height='80'/%3E%3Ctext x='60' y='45' font-family='Arial' font-size='12' fill='%23fff' text-anchor='middle'%3ETornado%3C/text%3E%3C/svg%3E" 
+                             class="result-thumbnail" alt="Result">
+                        <div class="result-content">
+                            <div class="result-title">Tornado Alley: Historic 2019 Storm Season</div>
+                            <div class="result-url">nationalgeographic.com/tornado-season-2019</div>
+                            <div class="result-date">May 2, 2019</div>
+                            <div class="result-snippet">The 2019 tornado season in the US midwest was one of the most active on record...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scene 4: Original Source -->
+        <div class="scene" id="scene4">
+            <div class="scene-title">Step 4: Find the Original Source</div>
+            <div class="article-view">
+                <div class="article-header">WeatherNews.com - Trusted Weather Reporting</div>
+                <div class="article-content">
+                    <h2>Oklahoma Tornado - April 2019</h2>
+                    <div class="article-meta">Published: April 15, 2019 | By: Sarah Johnson, Meteorologist</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='400'%3E%3Crect fill='%23333' width='800' height='400'/%3E%3Ctext x='400' y='200' font-family='Arial' font-size='24' fill='%23fff' text-anchor='middle'%3E%5BDramatic Tornado Image%5D%3C/text%3E%3C/svg%3E" 
+                         class="article-image" alt="Tornado">
+                    <div class="article-text">
+                        <p>A devastating EF4 tornado touched down in rural Oklahoma on April 15, 2019, causing significant damage to several communities. The tornado was part of a larger severe weather outbreak across the central United States.</p>
+                        <p>Emergency services responded immediately, and fortunately, there were no fatalities due to early warning systems and proper shelter procedures.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scene 5: Comparison -->
+        <div class="scene" id="scene5">
+            <div class="scene-title">Step 5: Verify the Truth</div>
+            <div class="comparison">
+                <div class="comparison-side false">
+                    <div class="comparison-label false">❌ FALSE CLAIM</div>
+                    <div class="comparison-content">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23333' width='300' height='200'/%3E%3Ctext x='150' y='100' font-family='Arial' font-size='16' fill='%23fff' text-anchor='middle'%3ETornado%3C/text%3E%3C/svg%3E" 
+                             class="comparison-image" alt="Tornado">
+                        <div class="comparison-text">
+                            <strong>"Tornado just hit London!"</strong><br><br>
+                            • Claimed to be recent<br>
+                            • Claimed location: London<br>
+                            • No verification<br>
+                            • Urgency language to prevent fact-checking
+                        </div>
+                    </div>
+                </div>
+                <div class="comparison-side true">
+                    <div class="comparison-label true">✅ TRUE CONTEXT</div>
+                    <div class="comparison-content">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23333' width='300' height='200'/%3E%3Ctext x='150' y='100' font-family='Arial' font-size='16' fill='%23fff' text-anchor='middle'%3ETornado%3C/text%3E%3C/svg%3E" 
+                             class="comparison-image" alt="Tornado">
+                        <div class="comparison-text">
+                            <strong>Oklahoma Tornado - 2019</strong><br><br>
+                            • Actually from April 2019<br>
+                            • Location: Oklahoma, USA<br>
+                            • Verified by weather authorities<br>
+                            • Properly documented event
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="checkmark">✅ Misinformation Debunked!</div>
+        </div>
+
+        <!-- Cursor -->
+        <div class="cursor" id="animatedCursor">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 3L10.07 19.97L12.58 12.58L19.97 10.07L3 3Z" fill="white" stroke="black" stroke-width="1.5"/>
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        let currentScene = 1;
+        let isPaused = false;
+        let isRunning = false;
+        let animationTimeout;
+        let resumeCallback = null;
+
+        const explanations = {
+            1: {
+                title: "📸 Step 1: A Suspicious Claim",
+                text: "You see a dramatic image with an alarming claim on social media. The post uses urgency language like 'share before they delete!' and makes an extraordinary claim. This is your first sign to verify before sharing. Let's check if this image is real."
+            },
+            2: {
+                title: "🖱️ Step 2: Right-Click to Search",
+                text: "To verify an image, right-click on it and select 'Search image with Google' (or similar option depending on your browser). This performs a reverse image search to find where else this image appears online and discover its original source."
+            },
+            3: {
+                title: "🔍 Step 3: Check Reverse Image Results",
+                text: "The reverse image search reveals that this image has appeared before, and it's from Oklahoma in 2019 - not London today! Multiple credible sources show the same image from years ago. This tells us the claim is false - it's an old photo being used out of context."
+            },
+            4: {
+                title: "📰 Step 4: Find the Original Source",
+                text: "Click on a credible result to see the original article. Here we find it's from a legitimate weather news site, published in April 2019, about an Oklahoma tornado. The original article has proper attribution, date, author credentials, and accurate context."
+            },
+            5: {
+                title: "✅ Step 5: Verify the Truth",
+                text: "By comparing the false claim with the true context, we can see how the same image was misused. The image is real, but the context is completely false. This is a common misinformation tactic - using real photos with false claims. Always verify images before sharing!"
+            }
+        };
+
+        function updateExplanation(step) {
+            document.getElementById('explanationTitle').textContent = explanations[step].title;
+            document.getElementById('explanationText').textContent = explanations[step].text;
+            
+            document.querySelectorAll('.step-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`step${step}Btn`).classList.add('active');
+        }
+
+        function switchScene(sceneNumber) {
+            document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+            document.getElementById(`scene${sceneNumber}`).classList.add('active');
+            currentScene = sceneNumber;
+            updateExplanation(sceneNumber);
+        }
+
+        function wait(ms) {
+            return new Promise((resolve) => {
+                animationTimeout = setTimeout(() => {
+                    if (isPaused) {
+                        resumeCallback = () => resolve(true);
+                        return;
+                    }
+                    resolve(true);
+                }, ms);
+            });
+        }
+
+        async function runAnimation() {
+            isRunning = true;
+            isPaused = false;
+
+            // Scene 1: Show suspicious post
+            switchScene(1);
+            await wait(3000);
+            if (isPaused) return;
+
+            // Scene 2: Right-click menu
+            switchScene(2);
+            const cursor = document.getElementById('animatedCursor');
+            const contextMenu = document.getElementById('contextMenu');
+            
+            await wait(500);
+            if (isPaused) return;
+
+            // Move cursor to image
+            cursor.style.left = '50%';
+            cursor.style.top = '55%';
+            cursor.style.opacity = '1';
+            cursor.classList.add('active');
+
+            await wait(1000);
+            if (isPaused) return;
+
+            // Show context menu
+            contextMenu.style.left = '55%';
+            contextMenu.style.top = '55%';
+            contextMenu.classList.add('active');
+
+            await wait(1500);
+            if (isPaused) return;
+
+            // Move to "Search with Google" option
+            cursor.style.left = '62%';
+            cursor.style.top = '70%';
+
+            await wait(1000);
+            if (isPaused) return;
+
+            // Click animation
+            cursor.classList.add('clicking');
+            await wait(300);
+            if (isPaused) return;
+            cursor.classList.remove('clicking');
+
+            await wait(500);
+            if (isPaused) return;
+
+            cursor.style.opacity = '0';
+            cursor.classList.remove('active');
+
+            // Scene 3: Search results
+            switchScene(3);
+            await wait(2000);
+            if (isPaused) return;
+
+            // Highlight first result
+            document.getElementById('result1').classList.add('highlight');
+
+            await wait(1500);
+            if (isPaused) return;
+
+            // Move cursor to result
+            cursor.style.left = '50%';
+            cursor.style.top = '45%';
+            cursor.style.opacity = '1';
+            cursor.classList.add('active');
+
+            await wait(1000);
+            if (isPaused) return;
+
+            // Click result
+            cursor.classList.add('clicking');
+            await wait(300);
+            if (isPaused) return;
+            cursor.classList.remove('clicking');
+
+            await wait(500);
+            if (isPaused) return;
+
+            cursor.style.opacity = '0';
+            cursor.classList.remove('active');
+
+            // Scene 4: Original article
+            switchScene(4);
+            await wait(3000);
+            if (isPaused) return;
+
+            // Scene 5: Comparison
+            switchScene(5);
+
+            isRunning = false;
+        }
+
+        function goToStep(step) {
+            isPaused = true;
+            isRunning = false;
+            clearTimeout(animationTimeout);
+            resumeCallback = null;
+            
+            document.getElementById('startMessage').classList.add('hidden');
+            
+            const cursor = document.getElementById('animatedCursor');
+            const contextMenu = document.getElementById('contextMenu');
+            cursor.style.opacity = '0';
+            cursor.classList.remove('active');
+            contextMenu.classList.remove('active');
+            
+            document.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
+            
+            switchScene(step);
+
+            if (step === 2) {
+                contextMenu.style.left = '55%';
+                contextMenu.style.top = '55%';
+                contextMenu.classList.add('active');
+            } else if (step === 3) {
+                document.getElementById('result1').classList.add('highlight');
+            }
+        }
+
+        document.getElementById('playBtn').addEventListener('click', () => {
+            document.getElementById('startMessage').classList.add('hidden');
+            
+            if (isPaused && resumeCallback) {
+                isPaused = false;
+                const callback = resumeCallback;
+                resumeCallback = null;
+                callback();
+            } else if (!isRunning) {
+                runAnimation();
+            }
+        });
+
+        document.getElementById('pauseBtn').addEventListener('click', () => {
+            if (isRunning && !isPaused) {
+                isPaused = true;
+                clearTimeout(animationTimeout);
+            }
+        });
+
+        document.getElementById('replayBtn').addEventListener('click', () => {
+            isPaused = false;
+            isRunning = false;
+            resumeCallback = null;
+            clearTimeout(animationTimeout);
+            currentScene = 1;
+            switchScene(1);
+            
+            const cursor = document.getElementById('animatedCursor');
+            const contextMenu = document.getElementById('contextMenu');
+            cursor.style.opacity = '0';
+            cursor.classList.remove('active');
+            contextMenu.classList.remove('active');
+            
+            document.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
+            document.getElementById('startMessage').classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
