@@ -421,6 +421,40 @@
         .cursor.clicking {
             animation: click-animation 0.3s ease-in-out 2;
         }
+
+        .start-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(102, 126, 234, 0.95);
+            color: white;
+            padding: 30px 50px;
+            border-radius: 16px;
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            z-index: 100;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+            opacity: 1;
+            transition: opacity 0.5s;
+        }
+
+        .start-message.hidden {
+            opacity: 0;
+        }
+
+        .start-message .arrow {
+            font-size: 32px;
+            margin-top: 10px;
+            animation: bounce-arrow 1.5s infinite;
+        }
+
+        @keyframes bounce-arrow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
     </style>
 </head>
 <body>
@@ -450,6 +484,12 @@
     </div>
 
     <div class="container">
+        <!-- Start Message Overlay -->
+        <div class="start-message" id="startMessage">
+            ▶ Press Play to start the demo
+            <div class="arrow">↑</div>
+        </div>
+
         <!-- Scene 1: Chat Interface -->
         <div class="scene active" id="scene1">
             <div class="scene-title">Step 1: Creating False Content with AI</div>
@@ -585,6 +625,9 @@
             isRunning = false;
             clearTimeout(animationTimeout);
             resumeCallback = null;
+            
+            // Hide start message when jumping to steps
+            document.getElementById('startMessage').classList.add('hidden');
             
             switchScene(step);
             updateExplanation(step);
@@ -840,6 +883,9 @@
         }
 
         document.getElementById('playBtn').addEventListener('click', () => {
+            // Hide start message
+            document.getElementById('startMessage').classList.add('hidden');
+            
             if (isPaused && resumeCallback) {
                 // Resume from paused state
                 isPaused = false;
@@ -865,11 +911,11 @@
             resumeCallback = null;
             clearTimeout(animationTimeout);
             currentScene = 1;
-            runAnimation();
+            switchScene(1);
+            
+            // Show start message again
+            document.getElementById('startMessage').classList.remove('hidden');
         });
-
-        // Auto-start
-        setTimeout(() => runAnimation(), 500);
     </script>
 </body>
 </html>
