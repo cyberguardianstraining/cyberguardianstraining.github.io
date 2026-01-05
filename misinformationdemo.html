@@ -270,6 +270,7 @@
         /* Controls */
         .controls {
             margin-top: 20px;
+            margin-bottom: 10px;
             display: flex;
             gap: 15px;
             justify-content: center;
@@ -363,7 +364,7 @@
             background: white;
             border-radius: 12px;
             padding: 25px;
-            margin-top: 20px;
+            margin-bottom: 20px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             max-width: 900px;
             width: 100%;
@@ -385,9 +386,10 @@
         }
 
         .step-label {
-            font-size: 12px;
-            color: #ffffff;
+            font-size: 16px;
+            color: white;
             margin-bottom: 5px;
+            font-weight: 600;
         }
 
         .cursor {
@@ -425,6 +427,26 @@
     <div class="header">
         <h1>🔍 How Misinformation Spreads: An Educational Demo</h1>
         <p>Understanding the pipeline from AI-generated content to search results</p>
+    </div>
+
+    <div class="explanation-box">
+        <h3 id="explanationTitle">📝 Step 1: Creating False Content with AI</h3>
+        <p id="explanationText">Anyone can easily request an AI chatbot to create false or misleading content. In this example, someone asks the AI to generate a fake news article about phones listening to conversations. The AI complies and creates convincing-looking content, complete with fake sources and professional formatting. This demonstrates how accessible these tools are for creating misinformation.</p>
+    </div>
+
+    <div class="controls">
+        <button class="play-btn" id="playBtn">▶ Play</button>
+        <button class="pause-btn" id="pauseBtn">⏸ Pause</button>
+        <button class="replay-btn" id="replayBtn">↻ Replay</button>
+    </div>
+
+    <div class="step-controls">
+        <div class="step-label">Jump to step:</div>
+        <button class="step-btn active" id="step1Btn" onclick="goToStep(1)">1</button>
+        <button class="step-btn" id="step2Btn" onclick="goToStep(2)">2</button>
+        <button class="step-btn" id="step3Btn" onclick="goToStep(3)">3</button>
+        <button class="step-btn" id="step4Btn" onclick="goToStep(4)">4</button>
+        <button class="step-btn" id="step5Btn" onclick="goToStep(5)">5</button>
     </div>
 
     <div class="container">
@@ -510,26 +532,6 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="controls">
-        <button class="play-btn" id="playBtn">▶ Play</button>
-        <button class="pause-btn" id="pauseBtn">⏸ Pause</button>
-        <button class="replay-btn" id="replayBtn">↻ Replay</button>
-    </div>
-
-    <div class="step-controls">
-        <div class="step-label">Jump to step:</div>
-        <button class="step-btn active" id="step1Btn" onclick="goToStep(1)">1</button>
-        <button class="step-btn" id="step2Btn" onclick="goToStep(2)">2</button>
-        <button class="step-btn" id="step3Btn" onclick="goToStep(3)">3</button>
-        <button class="step-btn" id="step4Btn" onclick="goToStep(4)">4</button>
-        <button class="step-btn" id="step5Btn" onclick="goToStep(5)">5</button>
-    </div>
-
-    <div class="explanation-box">
-        <h3 id="explanationTitle">📝 Step 1: Creating False Content with AI</h3>
-        <p id="explanationText">Anyone can easily request an AI chatbot to create false or misleading content. In this example, someone asks the AI to generate a fake news article about phones listening to conversations. The AI complies and creates convincing-looking content, complete with fake sources and professional formatting. This demonstrates how accessible these tools are for creating misinformation.</p>
     </div>
 
     <script>
