@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Warning Signs Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .explanation-box {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .explanation-box h3 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .explanation-box p {
+            color: #444;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .controls {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .play-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .play-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .pause-btn {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .pause-btn:hover {
+            background: #d97706;
+        }
+
+        .replay-btn {
+            background: #64748b;
+            color: white;
+        }
+
+        .replay-btn:hover {
+            background: #475569;
+        }
+
+        .step-controls {
+            margin-top: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .step-label {
+            font-size: 16px;
+            color: white;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .step-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .step-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .step-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 900px;
+            min-height: 600px;
+            position: relative;
+            overflow: visible;
+        }
+
+        .scene {
+            padding: 0;
+            height: 100%;
+        }
+
+        /* Fake Website Container */
+        .fake-website {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        /* Browser Chrome */
+        .browser-chrome {
+            background: #f1f3f4;
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .browser-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .browser-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
+
+        .url-bar {
+            flex: 1;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 14px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .url-bar.highlight {
+            outline: 3px solid #dc2626;
+            outline-offset: 2px;
+            transition: outline 0.3s;
+        }
+
+        .lock-icon {
+            color: #888;
+        }
+
+        /* Fake News Site Header */
+        .site-header {
+            background: #1a1a1a;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .site-header.highlight {
+            outline: 3px solid #dc2626;
+            outline-offset: -3px;
+            transition: outline 0.3s;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            background: white;
+            position: relative;
+        }
+
+        /* Article */
+        .article-headline {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .article-headline.highlight {
+            outline: 3px solid #dc2626;
+            outline-offset: 2px;
+            transition: outline 0.3s;
+        }
+
+        .article-meta {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .article-meta.highlight {
+            outline: 3px solid #dc2626;
+            outline-offset: 2px;
+            transition: outline 0.3s;
+        }
+
+        .article-text {
+            line-height: 1.7;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .article-text p {
+            margin-bottom: 15px;
+        }
+
+        .article-text.highlight {
+            outline: 3px solid #dc2626;
+            outline-offset: 2px;
+            transition: outline 0.3s;
+        }
+
+        /* Pop-up Ads */
+        .popup-ad {
+            position: absolute;
+            background: #ff0000;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+            animation: shake 0.5s infinite;
+        }
+
+        .popup-ad.highlight {
+            outline: 3px solid #dc2626;
+            outline-offset: 2px;
+            transition: outline 0.3s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .popup-ad-1 {
+            top: 100px;
+            right: 20px;
+        }
+
+        .popup-ad-2 {
+            bottom: 100px;
+            left: 20px;
+        }
+
+        /* Urgency Banner */
+        .urgency-banner {
+            background: #dc2626;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            animation: pulse 1.5s infinite;
+        }
+
+        .urgency-banner.highlight {
+            outline: 3px solid #fbbf24;
+            outline-offset: -3px;
+            transition: outline 0.3s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Cursor */
+        .cursor {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            transform: translate(-50%, -50%);
+        }
+
+        .cursor.active {
+            opacity: 1;
+            transition: left 1s ease-in-out, top 1s ease-in-out, opacity 0.3s;
+        }
+
+        .cursor svg {
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+        }
+
+        /* Red Flag Popup */
+        .red-flag-popup {
+            position: absolute;
+            background: #dc2626;
+            color: white;
+            padding: 20px 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s ease-out;
+            max-width: 300px;
+            font-weight: 600;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .red-flag-popup.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .red-flag-popup::before {
+            content: '🚩';
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .start-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(102, 126, 234, 0.95);
+            color: white;
+            padding: 30px 50px;
+            border-radius: 16px;
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            z-index: 100;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+            opacity: 1;
+            transition: opacity 0.5s;
+        }
+
+        .start-message.hidden {
+            opacity: 0;
+        }
+
+        .start-message .arrow {
+            font-size: 32px;
+            margin-top: 10px;
+            animation: bounce-arrow 1.5s infinite;
+        }
+
+        @keyframes bounce-arrow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .no-about {
+            color: #666;
+            font-size: 13px;
+            text-align: center;
+            padding: 10px;
+            border-top: 1px solid #eee;
+            margin-top: 20px;
+        }
+
+        .no-about.highlight {
+            outline: 3px solid #dc2626;
+            outline-offset: -3px;
+            transition: outline 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚩 Spotting Fake News: Warning Signs</h1>
+        <p>Learn to identify red flags in suspicious articles</p>
+    </div>
+
+    <div class="explanation-box">
+        <h3 id="explanationTitle">🔍 Introduction: Identifying Warning Signs</h3>
+        <p id="explanationText">This demo shows a fake news article with multiple warning signs. Learn to spot these red flags to protect yourself from misinformation. Click through each step to see common indicators of unreliable content.</p>
+    </div>
+
+    <div class="controls">
+        <button class="play-btn" id="playBtn">▶ Play</button>
+        <button class="pause-btn" id="pauseBtn">⏸ Pause</button>
+        <button class="replay-btn" id="replayBtn">↻ Replay</button>
+    </div>
+
+    <div class="step-controls">
+        <div class="step-label">Jump to warning sign:</div>
+        <button class="step-btn active" id="step0Btn" onclick="goToStep(0)">Intro</button>
+        <button class="step-btn" id="step1Btn" onclick="goToStep(1)">1</button>
+        <button class="step-btn" id="step2Btn" onclick="goToStep(2)">2</button>
+        <button class="step-btn" id="step3Btn" onclick="goToStep(3)">3</button>
+        <button class="step-btn" id="step4Btn" onclick="goToStep(4)">4</button>
+        <button class="step-btn" id="step5Btn" onclick="goToStep(5)">5</button>
+        <button class="step-btn" id="step6Btn" onclick="goToStep(6)">6</button>
+        <button class="step-btn" id="step7Btn" onclick="goToStep(7)">7</button>
+    </div>
+
+    <div class="container">
+        <div class="start-message" id="startMessage">
+            ▶ Press Play to start identifying red flags
+            <div class="arrow">↑</div>
+        </div>
+
+        <div class="scene">
+            <div class="fake-website">
+                <!-- Browser Chrome -->
+                <div class="browser-chrome">
+                    <div class="browser-dots">
+                        <div class="browser-dot dot-red"></div>
+                        <div class="browser-dot dot-yellow"></div>
+                        <div class="browser-dot dot-green"></div>
+                    </div>
+                    <div class="url-bar" id="urlBar">
+                        <span class="lock-icon">🔓</span>
+                        <span>bbc-news-daily.com/breaking/government-scandal</span>
+                    </div>
+                </div>
+
+                <!-- Urgency Banner -->
+                <div class="urgency-banner" id="urgencyBanner">
+                    ⚠️ SHARE BEFORE IT'S TAKEN DOWN! Government trying to hide this! ⚠️
+                </div>
+
+                <!-- Site Header -->
+                <div class="site-header" id="siteHeader">
+                    BBC News Daily
+                </div>
+
+                <!-- Content Area -->
+                <div class="content-area">
+                    <div class="article-headline" id="headline">
+                        SHOCKING: Goverment Officials Caught in Masive Corruption Scandal!
+                    </div>
+
+                    <div class="article-meta" id="articleMeta">
+                        Published: Today | By: Staff Writer
+                    </div>
+
+                    <div class="article-text" id="articleText">
+                        <p>In a shocking turn of events that the mainstream media doesnt want you to know about, high-ranking government officials have been exposed in what experts are calling the biggest corruption scandal in history.</p>
+                        
+                        <p>Multiple anonymous sources confirm that billions of dollars have been misapropriated, but authorities refuse to comment on these seriosu allegations. The coverup runs deep!</p>
+                        
+                        <p>This is the story they don't want you to see. Share this artical immediately before it gets removed from the internet!</p>
+                    </div>
+
+                    <div class="no-about" id="noAbout">
+                        © 2024 BBC News Daily | No contact information available
+                    </div>
+
+                    <!-- Pop-up Ads -->
+                    <div class="popup-ad popup-ad-1" id="popupAd1">
+                        ⚡ CLICK HERE NOW! WIN $1000! ⚡
+                    </div>
+                    <div class="popup-ad popup-ad-2" id="popupAd2">
+                        🎁 CLAIM YOUR PRIZE! 🎁
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cursor -->
+            <div class="cursor" id="animatedCursor">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 3L10.07 19.97L12.58 12.58L19.97 10.07L3 3Z" fill="white" stroke="black" stroke-width="1.5"/>
+                </svg>
+            </div>
+
+            <!-- Red Flag Popup -->
+            <div class="red-flag-popup" id="redFlagPopup"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        let isPaused = false;
+        let isRunning = false;
+        let animationTimeout;
+
+        const explanations = {
+            0: {
+                title: "🔍 Introduction: Identifying Warning Signs",
+                text: "This demo shows a fake news article with multiple warning signs. Learn to spot these red flags to protect yourself from misinformation. Click through each step to see common indicators of unreliable content."
+            },
+            1: {
+                title: "🚩 Warning Sign #1: Suspicious URL",
+                text: "The URL 'bbc-news-daily.com' mimics the legitimate BBC website (bbc.co.uk) but isn't the real thing. Fake news sites often use URLs that look similar to trusted sources. Always check the exact domain name carefully."
+            },
+            2: {
+                title: "🚩 Warning Sign #2: Spelling & Grammar Errors",
+                text: "Notice 'Goverment' instead of 'Government', 'Masive' instead of 'Massive', and other typos throughout. Professional news organizations have editors who catch these errors. Multiple spelling mistakes are a red flag."
+            },
+            3: {
+                title: "🚩 Warning Sign #3: No About Us or Contact Info",
+                text: "Legitimate news sites have detailed 'About Us' pages, contact information, and transparency about their organization. This site provides none of that information - a major warning sign."
+            },
+            4: {
+                title: "🚩 Warning Sign #4: Sensational Headline",
+                text: "The headline uses ALL CAPS and exaggerated language like 'SHOCKING' and 'Masive Corruption Scandal' but the article provides no specific details or evidence. Sensationalism without substance is a red flag."
+            },
+            5: {
+                title: "🚩 Warning Sign #5: No Author Credentials",
+                text: "The article is by 'Staff Writer' with no actual name or credentials. Legitimate news articles include the author's name and often link to their bio showing their expertise and past work."
+            },
+            6: {
+                title: "🚩 Warning Sign #6: Excessive Pop-up Ads",
+                text: "The page is cluttered with aggressive, flashing pop-up ads promising prizes and money. Reputable news sites may have some ads, but not intrusive scam-like pop-ups that distract from the content."
+            },
+            7: {
+                title: "🚩 Warning Sign #7: Urgency and Fear Tactics",
+                text: "Messages like 'SHARE BEFORE IT'S TAKEN DOWN!' and 'they don't want you to see this' create false urgency. This manipulates emotions to get you to share without fact-checking first."
+            }
+        };
+
+        const redFlags = {
+            1: { 
+                element: 'urlBar', 
+                cursor: { top: '6%', left: '50%' },
+                popup: { top: '12%', left: '50%' },
+                text: "URL mimics real news (e.g., 'bbc-news-daily.com' instead of 'bbc.co.uk')"
+            },
+            2: { 
+                element: 'headline', 
+                cursor: { top: '35%', left: '30%' },
+                popup: { top: '28%', left: '60%' },
+                text: "Excessive spelling or grammar errors (Goverment, Masive, artical, etc.)"
+            },
+            3: { 
+                element: 'noAbout', 
+                cursor: { top: '88%', left: '50%' },
+                popup: { top: '78%', left: '50%' },
+                text: "No 'About Us' page or contact information"
+            },
+            4: { 
+                element: 'headline', 
+                cursor: { top: '35%', left: '50%' },
+                popup: { top: '42%', left: '60%' },
+                text: "Sensational headline that doesn't match the vague story content"
+            },
+            5: { 
+                element: 'articleMeta', 
+                cursor: { top: '42%', left: '40%' },
+                popup: { top: '35%', left: '65%' },
+                text: "No author name or credentials - just 'Staff Writer'"
+            },
+            6: { 
+                element: 'popupAd1', 
+                cursor: { top: '50%', left: '75%' },
+                popup: { top: '50%', left: '45%' },
+                text: "Lots of aggressive pop-up ads trying to distract you"
+            },
+            7: { 
+                element: 'urgencyBanner', 
+                cursor: { top: '10%', left: '50%' },
+                popup: { top: '18%', left: '50%' },
+                text: "'Share before it's taken down!' - False urgency to stop you fact-checking"
+            }
+        };
+
+        function updateExplanation(step) {
+            document.getElementById('explanationTitle').textContent = explanations[step].title;
+            document.getElementById('explanationText').textContent = explanations[step].text;
+            
+            // Update active step button
+            document.querySelectorAll('.step-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`step${step}Btn`).classList.add('active');
+        }
+
+        function clearHighlights() {
+            document.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
+        }
+
+        function wait(ms) {
+            return new Promise((resolve) => {
+                animationTimeout = setTimeout(() => {
+                    if (!isPaused) resolve(true);
+                }, ms);
+            });
+        }
+
+        async function showRedFlag(step) {
+            if (step === 0) return;
+
+            const flag = redFlags[step];
+            const cursor = document.getElementById('animatedCursor');
+            const popup = document.getElementById('redFlagPopup');
+            const element = document.getElementById(flag.element);
+
+            // Clear previous highlights
+            clearHighlights();
+
+            // Position and show cursor
+            cursor.style.left = flag.cursor.left;
+            cursor.style.top = flag.cursor.top;
+            cursor.style.opacity = '1';
+            cursor.classList.add('active');
+
+            await wait(1000);
+            if (isPaused) return;
+
+            // Highlight element
+            element.classList.add('highlight');
+
+            await wait(500);
+            if (isPaused) return;
+
+            // Show popup
+            popup.textContent = flag.text;
+            popup.style.left = flag.popup.left;
+            popup.style.top = flag.popup.top;
+            popup.style.transform = 'translate(-50%, -50%)';
+            popup.classList.add('active');
+
+            await wait(3000);
+            if (isPaused) return;
+
+            // Hide popup and cursor
+            popup.classList.remove('active');
+            cursor.style.opacity = '0';
+            cursor.classList.remove('active');
+
+            await wait(500);
+            if (isPaused) return;
+        }
+
+        async function runAnimation() {
+            isRunning = true;
+            isPaused = false;
+
+            for (let step = 1; step <= 7; step++) {
+                if (isPaused) return;
+                
+                currentStep = step;
+                updateExplanation(step);
+                await showRedFlag(step);
+                
+                if (isPaused) return;
+            }
+
+            isRunning = false;
+        }
+
+        function goToStep(step) {
+            isPaused = true;
+            isRunning = false;
+            clearTimeout(animationTimeout);
+            
+            document.getElementById('startMessage').classList.add('hidden');
+            
+            currentStep = step;
+            updateExplanation(step);
+            
+            clearHighlights();
+            document.getElementById('redFlagPopup').classList.remove('active');
+            document.getElementById('animatedCursor').style.opacity = '0';
+
+            if (step > 0) {
+                const flag = redFlags[step];
+                const element = document.getElementById(flag.element);
+                element.classList.add('highlight');
+                
+                const popup = document.getElementById('redFlagPopup');
+                popup.textContent = flag.text;
+                popup.style.left = flag.popup.left;
+                popup.style.top = flag.popup.top;
+                popup.style.transform = 'translate(-50%, -50%)';
+                popup.classList.add('active');
+            }
+        }
+
+        document.getElementById('playBtn').addEventListener('click', () => {
+            document.getElementById('startMessage').classList.add('hidden');
+            
+            if (!isRunning) {
+                runAnimation();
+            }
+        });
+
+        document.getElementById('pauseBtn').addEventListener('click', () => {
+            if (isRunning && !isPaused) {
+                isPaused = true;
+                clearTimeout(animationTimeout);
+            }
+        });
+
+        document.getElementById('replayBtn').addEventListener('click', () => {
+            isPaused = false;
+            isRunning = false;
+            clearTimeout(animationTimeout);
+            currentStep = 0;
+            clearHighlights();
+            document.getElementById('redFlagPopup').classList.remove('active');
+            document.getElementById('animatedCursor').style.opacity = '0';
+            updateExplanation(0);
+            document.getElementById('startMessage').classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
