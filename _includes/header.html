@@ -1,0 +1,14 @@
+<!-- Site-level header with logo and navigation -->
+<header class="site-header">
+    <div class="site-header-content">
+        <a href="{{ '/index.html' | relative_url }}" class="logo">
+            <img src="{{ '/logo.png' | relative_url }}" alt="CyberGuardians Logo">
+        </a>
+        <nav class="main-nav">
+            <a href="{{ '/index.html' | relative_url }}" {% if page.active_page == 'home' %}class="active"{% endif %}>Home</a>
+            <a href="{{ '/demonstrations.html' | relative_url }}" {% if page.active_page == 'demonstrations' %}class="active"{% endif %}>Demonstrations</a>
+            <a href="{{ '/links.html' | relative_url }}" {% if page.active_page == 'links' %}class="active"{% endif %}>Useful Links</a>
+            <a href="{{ '/learn.html' | relative_url }}" {% if page.active_page == 'learn' %}class="active"{% endif %}>Tips</a>
+        </nav>
+    </div>
+</header>

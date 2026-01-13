@@ -1,0 +1,212 @@
+---
+layout: default
+title: Brute Force Password Visualizer
+---
+
+<link rel="stylesheet" href="style.css">
+
+<div class="container">
+    <h1>Brute Force Visualizer</h1>
+
+    <div class="instructions">
+        <h2>What is password cracking?</h2>
+        <p>"Password cracking" is when somebody works out what a password is. This demonstration is a visualisation of the most basic way that hackers can "crack" passwords: using computers to try every password they can. </p>
+        <p>Computers can do this very, very quickly. Well secured websites make this difficult and can slow it down to only thousands of guesses per second, but it can be billions of guesses per second! Usually, hackers do this with a big list of "hashed" (gibberish) passwords from a company that has suffered a data breach. </p>
+        <p><strong>How to use the demonstration:</strong></p>
+        <ul>
+            <li><strong>Select speed:</strong> Choose how many password combinations are tried per second. Start small so you can see what's going on, then speed it up to see how quickly hackers can try different combinations!</li>
+            <li><strong>Start the simulation:</strong> Click "Start" to begin and watch the guesses happen in realtime.</li>
+            <li><strong>Observe the difference:</strong> Notice how much longer it takes to check all possible passwords when uppercase, numbers, or symbols are added. But, get to a certain length and even all lower case can produce very strong passwords.</li>
+        </ul>
+
+        <p><strong>Key Takeaway:</strong> Safe passwords MUST be strong enough to avoid being cracked by this most basic approach as a bare minimum.</p>
+                <p>In reality, passwords also MUST be unpredictable. Better password cracking techniques will check passwords that are common alterations to known words (e.g. swapping S for $, or putting a number on the end) and previously breached passwords. Predictable passwords will be cracked in seconds. </p>
+
+
+    </div>
+
+    <div class="speed-controls">
+        <button class="speed-btn active" data-speed="1000">
+            <span class="speed-label">Very Slow</span>
+            <span class="speed-value">1000 per second</span>
+        </button>
+        <button class="speed-btn" data-speed="100000">
+            <span class="speed-label">Slow</span>
+            <span class="speed-value">100,000 per second</span>
+        </button>
+        <button class="speed-btn" data-speed="10000000">
+            <span class="speed-label">Medium</span>
+            <span class="speed-value">Ten million per second</span>
+        </button>
+        <button class="speed-btn" data-speed="1000000000">
+            <span class="speed-label">Fast</span>
+            <span class="speed-value">One billion per second</span>
+        </button>
+    </div>
+
+    <div class="control-buttons">
+        <button class="btn" id="start-btn">Start</button>
+        <button class="btn" id="stop-btn" disabled>Stop</button>
+        <button class="btn" id="reset-btn">Reset</button>
+    </div>
+
+    <div class="comparison-container">
+        <div class="cracker-panel">
+            <div class="panel-header">All Lowercase Password</div>
+
+            <div class="current-attempt-value" id="current-attempt-1">a</div>
+
+            <div class="milestones" id="milestones-1">
+                <div class="milestone-item">
+                    <div class="milestone-label">1 character</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">2 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">3 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">4 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">5 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">6 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">7 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">8 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">9 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">10 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">11 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">12 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+            </div>
+
+            <div class="speed-disclaimer" id="speed-disclaimer-1">
+                Estimates based on current speed of 1,000 guesses/second
+            </div>
+
+            <!-- <button class="expand-btn" id="expand-btn-1">Show More Lengths</button> -->
+
+            <div class="charset-controls">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="uppercase-check-1">
+                    <span>Uppercase</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="numbers-check-1">
+                    <span>Numbers</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="symbols-check-1">
+                    <span>Symbols</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="cracker-panel">
+            <div class="panel-header">Both Cases, Numbers and Symbols</div>
+
+            <div class="current-attempt-value" id="current-attempt-2">!</div>
+
+            <div class="milestones" id="milestones-2">
+                <div class="milestone-item">
+                    <div class="milestone-label">1 character</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">2 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">3 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">4 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">5 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">6 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">7 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">8 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">9 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">10 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">11 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-label">12 characters</div>
+                    <div class="milestone-status">-</div>
+                </div>
+            </div>
+
+            <div class="speed-disclaimer" id="speed-disclaimer-2">
+                Estimates based on current speed of 1,000 guesses/second
+            </div>
+
+            <!-- <button class="expand-btn" id="expand-btn-2">Show More Lengths</button> -->
+
+            <div class="charset-controls">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="uppercase-check-2" checked>
+                    <span>Uppercase</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="numbers-check-2" checked>
+                    <span>Numbers</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="symbols-check-2" checked>
+                    <span>Symbols</span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>

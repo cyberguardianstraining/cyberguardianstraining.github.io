@@ -1,0 +1,645 @@
+---
+layout: default
+title: URL Hierarchy Visualizer
+---
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;            
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        
+        .container {
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .intro {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .input-section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #4A90E2;
+        }
+        
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background: #4A90E2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        button:hover {
+            background: #357ABD;
+        }
+        
+        .examples {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .examples span {
+            display: inline-block;
+            margin-right: 15px;
+            cursor: pointer;
+            color: #4A90E2;
+            text-decoration: underline;
+        }
+        
+        .examples span:hover {
+            color: #357ABD;
+        }
+        
+        .visualization {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-height: 300px;
+            display: none;
+        }
+        
+        .visualization.active {
+            display: block;
+        }
+        
+        .url-breakdown {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 6px;
+        }
+        
+        .url-breakdown-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .url-parts {
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .url-parts .domain-part {
+            background: #E8F4F8;
+            color: #4A90E2;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .url-parts .subdomain-part {
+            background: #FFF4E6;
+            color: #F39C12;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .url-parts .path-part {
+            background: #F0E6FF;
+            color: #9B59B6;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .url-parts .separator {
+            color: #999;
+            margin: 0 2px;
+        }
+        
+        .boxes-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .inner-items {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .box {
+            border: 3px solid #333;
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .box-label {
+            position: absolute;
+            top: -12px;
+            left: 10px;
+            background: white;
+            padding: 2px 8px;
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 3px;
+        }
+        
+        .box-content {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .domain-content {
+            position: absolute;
+            top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .domain-box {
+            background: #E8F4F8;
+            border-color: #4A90E2;
+            padding: 60px 20px 20px 20px;
+        }
+        
+        .domain-box.has-inner {
+            padding-bottom: 20px;
+        }
+        
+        .domain-box .box-label {
+            color: #4A90E2;
+        }
+        
+        .subdomain-box {
+            background: #FFF4E6;
+            border-color: #F39C12;
+            padding: 20px 10px 10px 10px;
+        }
+        
+        .subdomain-box .box-label {
+            color: #F39C12;
+        }
+        
+        .path-box {
+            background: #F0E6FF;
+            border-color: #9B59B6;
+            padding: 20px 10px 10px 10px;
+        }
+        
+        .path-box .box-label {
+            color: #9B59B6;
+        }
+        
+        .explanation {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 4px solid #4A90E2;
+            border-radius: 4px;
+        }
+        
+        .explanation h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .explanation p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .warning {
+            background: #FFF4E6;
+            border-left-color: #F39C12;
+            margin-top: 15px;
+        }
+        
+        .warning h3 {
+            color: #F39C12;
+        }
+        
+        .tld-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .tld-info strong {
+            color: #333;
+        }
+    </style>
+    <div class="container">
+        <h1>URL Hierarchy Visualizer</h1>
+        <p class="intro">
+            Learn how website addresses (URLs) work to protect yourself from fake websites and scams. 
+            The most important thing is knowing the main <strong>domain name</strong> of the website you are visiting. 
+        </p>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" id="urlInput" placeholder="Enter a URL (e.g., docs.google.com)" />
+                <button onclick="visualize()">Visualize</button>
+            </div>
+            <div class="examples">
+                Try:
+                <span onclick="setExample('docs.google.com')">docs.google.com</span>
+                <span onclick="setExample('https://www.google.com')">https://www.google.com</span>
+                <span onclick="setExample('http://example.com')">http://example.com</span>
+                <span onclick="setExample('google.fakesite.com')">google.fakesite.com</span>
+                <span onclick="setExample('paypal.secure-login.com/account')">paypal.secure-login.com/account</span>
+                <span onclick="setExample('goog1e.com')">goog1e.com</span>
+            </div>
+        </div>
+        
+        <div class="visualization" id="visualization">
+            <div class="url-breakdown" id="urlBreakdown"></div>
+            <div class="boxes-container" id="boxesContainer"></div>
+            <div id="explanation"></div>
+        </div>
+    </div>
+
+    <script>
+        // Common TLD suffixes - will be loaded from tlds.dat
+        let SUFFIXES = [
+            // Fallback list while testing
+            'com', 'org', 'net', 'edu', 'gov', 'mil',
+            'uk', 'co.uk', 'org.uk', 'ac.uk', 'gov.uk',
+            'au', 'com.au', 'org.au', 'gov.au',
+            'jp', 'co.jp', 'ac.jp',
+            'nz', 'co.nz', 'org.nz', 'govt.nz'
+        ];
+        let suffixesLoaded = false;
+
+        // Load TLD suffixes from file
+        async function loadSuffixes() {
+            try {
+                const response = await fetch('tlds.dat');
+                if (!response.ok) throw new Error('File not found');
+                const text = await response.text();
+                const loaded = text.split('\n')
+                    .map(s => s.trim())
+                    .filter(s => s && !s.startsWith('//'));
+                
+                if (loaded.length > 0) {
+                    SUFFIXES = loaded;
+                    console.log('Loaded', SUFFIXES.length, 'TLDs from file');
+                }
+                suffixesLoaded = true;
+            } catch (error) {
+                console.log('Using fallback TLD list (tlds.dat not found)');
+                suffixesLoaded = true;
+            }
+        }
+
+        // Load on page load
+        loadSuffixes();
+
+        function setExample(url) {
+            document.getElementById('urlInput').value = url;
+            visualize();
+        }
+
+        function findSuffix(parts) {
+            // First try two-part suffixes, then one-part
+            // This ensures gov.uk matches before uk
+            if (parts.length >= 2) {
+                const twoPartSuffix = parts.slice(-2).join('.');
+                console.log('Checking two-part suffix:', twoPartSuffix, 'Found:', SUFFIXES.includes(twoPartSuffix));
+                if (SUFFIXES.includes(twoPartSuffix)) {
+                    return 2;
+                }
+            }
+            
+            // Then try single-part suffix
+            if (parts.length >= 1) {
+                const onePartSuffix = parts[parts.length - 1];
+                console.log('Checking one-part suffix:', onePartSuffix, 'Found:', SUFFIXES.includes(onePartSuffix));
+                if (SUFFIXES.includes(onePartSuffix)) {
+                    return 1;
+                }
+            }
+            
+            // Default: last part is TLD
+            return 1;
+        }
+
+        function visualize() {
+            if (!suffixesLoaded) {
+                alert('Loading domain data, please wait a moment...');
+                setTimeout(visualize, 500);
+                return;
+            }
+
+            const input = document.getElementById('urlInput').value.trim().toLowerCase();
+            if (!input) return;
+
+            // Extract protocol
+            let protocol = '';
+            let cleanInput = input;
+            if (input.startsWith('https://')) {
+                protocol = 'https';
+                cleanInput = input.substring(8);
+            } else if (input.startsWith('http://')) {
+                protocol = 'http';
+                cleanInput = input.substring(7);
+            }
+
+            // Clean up input but preserve path
+            let url = cleanInput;
+            let path = '';
+            const pathIndex = url.indexOf('/');
+            if (pathIndex !== -1) {
+                path = url.substring(pathIndex);
+                url = url.substring(0, pathIndex);
+            }
+
+            const parts = url.split('.');
+            if (parts.length < 2) {
+                alert('Please enter a valid domain with at least two parts (e.g., example.com)');
+                return;
+            }
+
+            const suffixLength = findSuffix(parts);
+            const domainParts = parts.slice(-(suffixLength + 1));
+            let subdomainParts = parts.slice(0, -(suffixLength + 1));
+
+            // Check if www is present and remove it from subdomain parts
+            const hasWww = subdomainParts.length > 0 && subdomainParts[0] === 'www';
+            if (hasWww) {
+                subdomainParts = subdomainParts.slice(1);
+            }
+
+            const domain = domainParts.join('.');
+            const hasSubdomains = subdomainParts.length > 0;
+            const hasPath = path.length > 0;
+            
+            // Build visualization
+            const container = document.getElementById('boxesContainer');
+            container.innerHTML = '';
+            
+            let currentBox = null;
+            
+            // Create domain box (outermost)
+            const domainBox = document.createElement('div');
+            domainBox.className = 'box domain-box';
+            if (hasSubdomains || hasPath) {
+                domainBox.classList.add('has-inner');
+            }
+            domainBox.style.minWidth = (hasSubdomains || hasPath) ? '500px' : '200px';
+            domainBox.style.display = 'inline-block';
+            domainBox.style.width = 'auto';
+            
+            const domainLabel = document.createElement('div');
+            domainLabel.className = 'box-label';
+            domainLabel.textContent = 'Main Domain (who owns and controls this website)';
+            domainBox.appendChild(domainLabel);
+            
+            const domainContent = document.createElement('div');
+            domainContent.className = 'domain-content';
+            domainContent.textContent = domain;
+            domainBox.appendChild(domainContent);
+            
+            container.appendChild(domainBox);
+            
+            // Create container for subdomain and path boxes
+            const innerContainer = document.createElement('div');
+            innerContainer.className = 'inner-items';
+            domainBox.appendChild(innerContainer);
+            
+            // Create subdomain boxes (nested inside)
+            if (hasSubdomains) {
+                for (let i = subdomainParts.length - 1; i >= 0; i--) {
+                    const subBox = document.createElement('div');
+                    subBox.className = 'box subdomain-box';
+                    subBox.style.display = 'flex';
+                    subBox.style.justifyContent = 'center';
+                    subBox.style.alignItems = 'center';
+                    subBox.style.minWidth = '200px';
+                    subBox.style.minHeight = '100px';
+                    
+                    const subLabel = document.createElement('div');
+                    subLabel.className = 'box-label';
+                    if (subdomainParts.length === 1) {
+                        subLabel.textContent = 'Subdomain (a section of this website)';
+                    } else {
+                        subLabel.textContent = `Subdomain level ${subdomainParts.length - i}`;
+                    }
+                    subBox.appendChild(subLabel);
+                    
+                    const subContent = document.createElement('div');
+                    subContent.className = 'box-content';
+                    subContent.textContent = subdomainParts[subdomainParts.length - 1 - i];
+                    subBox.appendChild(subContent);
+                    
+                    innerContainer.appendChild(subBox);
+                }
+            }
+            
+            // Create path box if present
+            if (hasPath) {
+                const pathBox = document.createElement('div');
+                pathBox.className = 'box path-box';
+                pathBox.style.display = 'flex';
+                pathBox.style.justifyContent = 'center';
+                pathBox.style.alignItems = 'center';
+                pathBox.style.minWidth = '200px';
+                pathBox.style.minHeight = '100px';
+                
+                const pathLabel = document.createElement('div');
+                pathLabel.className = 'box-label';
+                pathLabel.textContent = 'Path (a specific page)';
+                pathBox.appendChild(pathLabel);
+                
+                const pathContent = document.createElement('div');
+                pathContent.className = 'box-content';
+                pathContent.textContent = path;
+                pathBox.appendChild(pathContent);
+                
+                innerContainer.appendChild(pathBox);
+            }
+            
+            // Generate explanation
+            generateExplanation(url + path, domain, subdomainParts, path, protocol, hasWww);
+
+            // Generate URL breakdown
+            generateUrlBreakdown(domain, subdomainParts, path, hasWww);
+
+            document.getElementById('visualization').classList.add('active');
+        }
+
+        function generateExplanation(fullUrl, domain, subdomains, path, protocol, hasWww) {
+            const container = document.getElementById('explanation');
+
+            const isLegit = domain.includes('google') || domain.includes('paypal') || domain.includes('microsoft');
+            const hasSubdomains = subdomains.length > 0;
+            const hasPath = path && path.length > 0;
+
+            // Check for character substitution tricks - only flag actual suspicious domains
+            const suspiciousDomains = ['goog1e', 'googl3', 'g00gle', 'paypa1', 'paypa!', 'micr0s0ft', 'app1e', 'amaz0n'];
+            const hasTrickChars = suspiciousDomains.some(sus => domain.includes(sus));
+
+            let html = '';
+
+            // Protocol explanation (if provided)
+            if (protocol === 'https') {
+                html += '<div class="explanation" style="background: #E8F8F5; border-left-color: #27AE60;">';
+                html += '<h3 style="color: #27AE60;">🔒 Secure Connection (HTTPS)</h3>';
+                html += '<p>This website uses HTTPS, which means the connection is encrypted. Any data you send to or receive from this website cannot be read if intercepted by someone else.</p>';
+                html += '</div>';
+            } else if (protocol === 'http') {
+                html += '<div class="explanation warning">';
+                html += '<h3>⚠️ Unencrypted Connection (HTTP)</h3>';
+                html += '<p>This website uses HTTP, which is NOT encrypted. This is potentially dangerous because anyone intercepting your connection can read everything you send or receive, including passwords and personal information.</p>';
+                html += '</div>';
+            }
+
+            html += '<div class="explanation">';
+            html += '<h3>What this means:</h3>';
+            html += `<p><strong>${domain}</strong> is the main domain. This tells you who owns and controls the website. Everything else is just part of their website. `;
+            html += `Domain names usually have an ending like .com, .co.uk, .org and so on. They'll be at the right of the URL, before any slash (/).</p>`;
+
+            if (hasSubdomains) {
+                html += `<p>The part "<strong>${subdomains.join('.')}</strong>" is called a subdomain. It's just a section within ${domain}'s website. The owner of ${domain} controls all their subdomains. `;
+                html += `Subdomains are always to the left of the main domain. For URLs that have multiple parts separated by full stops (.), like this one, start reading these on the right.</p>`;
+            }
+
+            if (hasPath) {
+                html += `<p>The part "<strong>${path}</strong>" is called a path. It's just the address of a specific page on the website, like a folder name on your computer. `;
+                html += `Anything after a slash (/) is a path, not the domain.</p>`;
+            }
+
+            if (hasWww) {
+                html += `<p><strong>About "www":</strong> The "www" at the beginning stands for "World Wide Web" and isn't really necessary anymore. Most modern websites work with or without it (e.g., www.google.com and google.com go to the same place).</p>`;
+            }
+
+            html += '</div>';
+            
+            // Add warning for phishing examples with subdomains
+            if (hasSubdomains && !isLegit && (subdomains.some(s => s.includes('google') || s.includes('paypal') || s.includes('microsoft')))) {
+                const brandName = subdomains.some(s => s.includes('google')) ? 'Google' : 
+                                 subdomains.some(s => s.includes('paypal')) ? 'PayPal' : 'Microsoft';
+                const brandDomain = brandName.toLowerCase() + '.com';
+                
+                html += '<div class="explanation warning">';
+                html += '<h3>⚠️ Warning: This looks like a scam!</h3>';
+                html += `<p>Even though you can see the word "${subdomains.join('.')}" in the address, `;
+                html += `<strong>${domain}</strong> is the one who actually owns this website, NOT ${brandName}.</p>`;
+                html += `<p>A real ${brandName} website would be ${brandDomain} or something.${brandDomain}. It would NEVER be ${subdomains.join('.')}.${domain} because that means ${domain} owns it, not ${brandName}.</p>`;
+                html += '</div>';
+            }
+            
+            // Add warning for character substitution tricks
+            if (hasTrickChars) {
+                html += '<div class="explanation warning">';
+                html += '<h3>⚠️ Warning: Look-alike characters!</h3>';
+                html += `<p>This domain uses characters that look similar to real ones. For example, the number "1" looks like the letter "l", and "0" looks like "o".</p>`;
+                html += `<p><strong>${domain}</strong> is NOT the same as the real company's website. Scammers use these tricks to fool people at a quick glance. Always read domain names carefully!</p>`;
+                html += '</div>';
+            }
+            
+            // TLD info
+            html += '<div class="tld-info">';
+            html += '<strong>What are .com, .org, .co.uk?</strong> ';
+            html += 'These endings are called TLDs (Top-Level Domains). They\'re part of the main domain name. ';
+            html += 'For example, google.com and google.co.uk are both owned by Google, just for different countries.';
+            html += '</div>';
+            
+            container.innerHTML = html;
+        }
+        
+        function generateUrlBreakdown(domain, subdomains, path, hasWww) {
+            const container = document.getElementById('urlBreakdown');
+
+            let html = '<div class="url-breakdown-title">Here\'s what you entered:</div>';
+            html += '<div class="url-parts">';
+
+            // Show www first (if present) in gray
+            if (hasWww) {
+                html += `<span style="color: #999; background: #f0f0f0; padding: 4px 8px; border-radius: 4px;">www</span>`;
+                html += '<span class="separator">.</span>';
+            }
+
+            // Show subdomains first (if any)
+            if (subdomains.length > 0) {
+                for (let i = 0; i < subdomains.length; i++) {
+                    html += `<span class="subdomain-part">${subdomains[i]}</span>`;
+                    html += '<span class="separator">.</span>';
+                }
+            }
+
+            // Show domain
+            html += `<span class="domain-part">${domain}</span>`;
+
+            // Show path (if any)
+            if (path) {
+                html += `<span class="path-part">${path}</span>`;
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Allow Enter key to submit
+        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                visualize();
+            }
+        });
+    </script>

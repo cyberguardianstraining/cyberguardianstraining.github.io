@@ -1,0 +1,762 @@
+---
+layout: default
+title: Intro To Password Managers
+---
+
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+      min-height: 100vh;
+      color: #333;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .header-icon {
+      width: 72px;
+      height: 72px;
+      background: linear-gradient(135deg, #4A90E2, #357ABD);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      box-shadow: 0 8px 24px rgba(74, 144, 226, 0.3);
+    }
+    
+    .header-icon svg {
+      width: 36px;
+      height: 36px;
+      fill: none;
+      stroke: white;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    
+    .header h1 {
+      font-size: 28px;
+      margin: 0 0 10px;
+      color: #1a1a2e;
+    }
+    
+    .header p {
+      font-size: 18px;
+      color: #666;
+      margin: 0;
+    }
+    
+    /* Step Navigation */
+    .step-nav {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+    
+    .step-btn {
+      flex: 1;
+      padding: 16px 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: white;
+      color: #666;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .step-btn.active {
+      background: linear-gradient(135deg, #4A90E2, #357ABD);
+      color: white;
+      box-shadow: 0 4px 16px rgba(74, 144, 226, 0.4);
+      transform: translateY(-2px);
+    }
+    
+    .step-btn:not(.active):hover {
+      background: #f0f4f8;
+      transform: translateY(-1px);
+    }
+    
+    /* Content Panels */
+    .step-content {
+      display: none;
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      animation: fadeIn 0.4s ease;
+    }
+    
+    .step-content.active {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .step-content h2 {
+      color: #4A90E2;
+      font-size: 24px;
+      margin: 0 0 20px;
+    }
+    
+    .step-content p {
+      font-size: 17px;
+      color: #555;
+      margin-bottom: 16px;
+    }
+    
+    /* Info Cards */
+    .info-card {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-left: 4px solid #4A90E2;
+    }
+    
+    .info-card h3 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 19px;
+      margin: 0 0 15px;
+      color: #333;
+    }
+    
+    .info-card h3 .icon {
+      width: 32px;
+      height: 32px;
+      background: #4A90E2;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .info-card h3 .icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: white;
+      fill: none;
+      stroke-width: 2;
+    }
+    
+    .info-card ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    
+    .info-card li {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #555;
+    }
+    
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    
+    .input-wrapper {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .form-group input {
+      flex: 1;
+      padding: 14px 16px;
+      font-size: 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      -webkit-appearance: none;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: #4A90E2;
+      box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.15);
+    }
+    
+    /* Buttons */
+    .btn {
+      padding: 14px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 50px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #4A90E2, #357ABD);
+      color: white;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #f0f4f8;
+      color: #333;
+      flex-shrink: 0;
+    }
+    
+    .btn-secondary:hover {
+      background: #e4e8ec;
+    }
+    
+    .btn-generate {
+      background: linear-gradient(135deg, #FF9800, #F57C00);
+      color: white;
+      white-space: nowrap;
+    }
+    
+    .btn-generate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+    }
+    
+    .btn-save {
+      background: linear-gradient(135deg, #4CAF50, #43A047);
+      color: white;
+      width: 100%;
+    }
+    
+    .btn-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+    }
+    
+    .btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+    
+    /* Success Message */
+    .success-message {
+      display: none;
+      padding: 14px 16px;
+      background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+      border-radius: 10px;
+      margin-top: 12px;
+      color: #2E7D32;
+      font-size: 15px;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .success-message.show {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .success-message svg {
+      width: 22px;
+      height: 22px;
+      stroke: #4CAF50;
+      fill: none;
+      stroke-width: 2.5;
+      flex-shrink: 0;
+    }
+    
+    /* Saved Passwords List */
+    .saved-passwords {
+      margin-top: 30px;
+      display: none;
+    }
+    
+    .saved-passwords.show {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+    
+    .saved-passwords h3 {
+      font-size: 20px;
+      margin: 0 0 16px;
+      color: #333;
+    }
+    
+    .password-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: #f8fafc;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      border: 1px solid #e8e8e8;
+    }
+    
+    .password-item-info {
+      flex: 1;
+    }
+    
+    .password-item-site {
+      font-weight: 600;
+      font-size: 17px;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    
+    .password-item-pass {
+      font-family: monospace;
+      font-size: 14px;
+      color: #888;
+      letter-spacing: 2px;
+    }
+    
+    .password-item-check {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #4CAF50, #43A047);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .password-item-check svg {
+      width: 20px;
+      height: 20px;
+      stroke: white;
+      fill: none;
+      stroke-width: 3;
+    }
+    
+    .passwords-note {
+      font-size: 15px;
+      color: #666;
+      margin-top: 16px;
+      padding: 16px;
+      background: #f0f9f0;
+      border-radius: 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .passwords-note svg {
+      width: 20px;
+      height: 20px;
+      stroke: #4CAF50;
+      fill: none;
+      stroke-width: 2;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    
+    /* Encryption Animation */
+    .encryption-demo {
+      background: #1a1a2e;
+      border-radius: 16px;
+      padding: 30px;
+      margin: 20px 0;
+      min-height: 200px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .encryption-step {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+    }
+    
+    .encryption-step.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .encryption-box {
+      padding: 16px 24px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      text-align: center;
+      min-width: 140px;
+    }
+    
+    .encryption-box.original {
+      background: linear-gradient(135deg, #FFE082, #FFD54F);
+      color: #333;
+    }
+    
+    .encryption-box.process {
+      background: linear-gradient(135deg, #4A90E2, #357ABD);
+      color: white;
+    }
+    
+    .encryption-box.encrypted {
+      background: linear-gradient(135deg, #66BB6A, #4CAF50);
+      color: white;
+      font-family: monospace;
+    }
+    
+    .encryption-box.vault {
+      background: linear-gradient(135deg, #424242, #212121);
+      color: white;
+    }
+    
+    .encryption-arrow {
+      font-size: 28px;
+      color: #666;
+    }
+    
+    .encryption-label {
+      display: block;
+      font-size: 12px;
+      opacity: 0.8;
+      margin-bottom: 4px;
+      font-weight: 400;
+    }
+    
+    /* Key Points */
+    .key-point {
+      padding: 16px 20px;
+      background: #f8fafc;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    
+    .key-point-icon {
+      width: 28px;
+      height: 28px;
+      background: #4CAF50;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .key-point-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: white;
+      fill: none;
+      stroke-width: 3;
+    }
+    
+    .key-point p {
+      margin: 0;
+      font-size: 16px;
+    }
+    
+    .key-point strong {
+      color: #333;
+    }
+    
+    /* Responsive */
+    @media (max-width: 600px) {
+      body { padding: 16px; }
+      .header h1 { font-size: 24px; }
+      .step-btn { padding: 14px 8px; font-size: 14px; }
+      .step-content { padding: 20px; }
+      .input-wrapper { flex-direction: column; }
+      .btn-generate { width: 100%; }
+      .encryption-demo { padding: 20px; }
+      .encryption-step { gap: 12px; }
+      .encryption-box { min-width: 120px; padding: 12px 16px; font-size: 13px; }
+      .encryption-arrow { font-size: 20px; }
+    }
+  </style>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h1>Understanding Password Managers</h1>
+      <p>A simple guide to keeping your passwords safe</p>
+    </div>
+
+    <!-- Step Navigation -->
+    <div class="step-nav">
+      <button class="step-btn active" data-step="1">Step 1</button>
+      <button class="step-btn" data-step="2">Step 2</button>
+      <button class="step-btn" data-step="3">Step 3</button>
+    </div>
+
+    <!-- Step 1: What is a Password Manager -->
+    <div class="step-content active" id="step1">
+      <h2>What is a Password Manager?</h2>
+      
+      <p>Think of a password manager like a <strong>secure filing cabinet</strong> for all your passwords.</p>
+      <p>Instead of writing passwords on paper or trying to remember them all, you store them in one safe place on your computer or phone.</p>
+
+      <div class="info-card">
+        <h3>
+          <span class="icon"><svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></span>
+          The Problem It Solves
+        </h3>
+        <ul>
+          <li>You need different passwords for email, banking, shopping sites</li>
+          <li>Good passwords are hard to remember</li>
+          <li>Writing them down can be risky</li>
+          <li>Using the same password everywhere is dangerous</li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h3>
+          <span class="icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+          The Solution
+        </h3>
+        <p style="margin:0">A password manager remembers all your passwords for you. You only need to remember <strong>ONE master password</strong> to unlock everything else.</p>
+      </div>
+
+      <button class="btn btn-primary" onclick="goToStep(2)">
+        Continue to Step 2
+        <svg viewBox="0 0 24 24" style="stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <!-- Step 2: How It Works -->
+    <div class="step-content" id="step2">
+      <h2>How It Works</h2>
+      
+      <div class="info-card">
+        <h3>
+          <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+          Create Your Master Password
+        </h3>
+        <p>This is the <strong>ONE password</strong> you need to remember. Make it strong but memorable. For example, if you use the "three random words" technique, consider adding an extra word:</p>
+        <p style="background:#f0f0f0;padding:14px 18px;border-radius:8px;font-family:monospace;font-size:17px;margin:16px 0 0">Camcorder-Fossil-Jelly-Appealing</p>
+        <p>It's ok to write your master password down somewhere very safe if you're worried you'll forget it.</p>
+      </div>
+
+      <div class="form-group">
+        <label>Try creating a master password:</label>
+        <div class="input-wrapper">
+          <input type="password" id="masterPassword" placeholder="Enter your master password">
+          <button class="btn btn-secondary" id="togglePassword" aria-label="Show password">
+            <svg id="eyeIcon" viewBox="0 0 24 24" style="stroke-linecap:round;stroke-linejoin:round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="success-message" id="masterSuccess">
+          <!-- <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> -->
+          <span>Remember, this should be a strong one! This password protects all the others.</span>
+        </div>
+      </div>
+
+      <div class="info-card" style="margin-top:24px">
+        <h3>
+          <span class="icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+          The Password Manager Does the Rest
+        </h3>
+        <p style="margin-bottom:12px">Once you're logged in with your master password:</p>
+        <ul style="margin:0">
+          <li>It remembers all your other passwords</li>
+          <li>It fills them in automatically when you visit websites</li>
+          <li>It can create strong, random passwords for new accounts</li>
+          <li>Everything is encrypted and secure</li>
+        </ul>
+      </div>
+
+      <button class="btn btn-primary" onclick="goToStep(3)">
+        Try It Out in Step 3
+        <svg viewBox="0 0 24 24" style="stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <!-- Step 3: Try It Yourself -->
+    <div class="step-content" id="step3">
+      <h2>Adding passwords</h2>
+      <p>Many password managers can do this for you by prompting you when you log into a website. Let's try adding one manually:</p>
+      
+      <div class="info-card">
+        <h3>
+          <span class="icon"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
+          Add a Website Password
+        </h3>
+        
+        <div class="form-group" style="margin-top:16px">
+          <label>Website Name:</label>
+          <input type="text" id="newSite" placeholder="e.g., Gmail, Apple ID">
+        </div>
+
+        <div class="form-group">
+          <label>Password:</label>
+          <div class="input-wrapper">
+            <input type="text" id="newPass" placeholder="Your password">
+            <button class="btn btn-generate" id="generateBtn">Generate Strong</button>
+          </div>
+        </div>
+
+        <button class="btn btn-save" id="saveBtn">
+          <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save Password
+        </button>
+      </div>
+
+      <div class="saved-passwords" id="savedPasswords">
+        <h3>Your Saved Passwords</h3>
+        <div id="passwordList"></div>
+        <div class="passwords-note">
+          <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>All these passwords are safely stored and will be filled in automatically when you visit these websites.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let savedPasswords = [];
+    let currentStep = 1;
+
+    // Elements
+    const stepBtns = document.querySelectorAll('.step-btn');
+    const stepContents = document.querySelectorAll('.step-content');
+    const masterPasswordInput = document.getElementById('masterPassword');
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const eyeIcon = document.getElementById('eyeIcon');
+    const masterSuccess = document.getElementById('masterSuccess');
+    const newSiteInput = document.getElementById('newSite');
+    const newPassInput = document.getElementById('newPass');
+    const generateBtn = document.getElementById('generateBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const savedPasswordsSection = document.getElementById('savedPasswords');
+    const passwordList = document.getElementById('passwordList');
+
+    // Step Navigation
+    function goToStep(step) {
+      currentStep = step;
+      stepBtns.forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.step) === step);
+      });
+      stepContents.forEach(content => {
+        content.classList.remove('active');
+      });
+      document.getElementById('step' + step).classList.add('active');
+    }
+
+    stepBtns.forEach(btn => {
+      btn.addEventListener('click', () => goToStep(parseInt(btn.dataset.step)));
+    });
+
+    // Toggle Password Visibility
+    let passwordVisible = false;
+    togglePasswordBtn.addEventListener('click', () => {
+      passwordVisible = !passwordVisible;
+      masterPasswordInput.type = passwordVisible ? 'text' : 'password';
+      eyeIcon.innerHTML = passwordVisible 
+        ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+        : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    });
+
+    // Show success when master password entered
+    masterPasswordInput.addEventListener('input', () => {
+      masterSuccess.classList.toggle('show', masterPasswordInput.value.length > 0);
+    });
+
+    // Generate Password
+    function generatePassword() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%&';
+      let pass = '';
+      for (let i = 0; i < 14; i++) {
+        pass += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return pass;
+    }
+
+    generateBtn.addEventListener('click', () => {
+      newPassInput.value = generatePassword();
+    });
+
+    // Save Password
+    saveBtn.addEventListener('click', () => {
+      const site = newSiteInput.value.trim();
+      const pass = newPassInput.value.trim();
+      
+      if (site && pass) {
+        savedPasswords.push({ site, password: pass });
+        renderPasswords();
+        newSiteInput.value = '';
+        newPassInput.value = '';
+      }
+    });
+
+    // Render Passwords
+    function renderPasswords() {
+      if (savedPasswords.length === 0) {
+        savedPasswordsSection.classList.remove('show');
+        return;
+      }
+      
+      savedPasswordsSection.classList.add('show');
+      passwordList.innerHTML = savedPasswords.map(item => `
+        <div class="password-item">
+          <div class="password-item-info">
+            <div class="password-item-site">${escapeHtml(item.site)}</div>
+            <div class="password-item-pass">••••••••••••</div>
+          </div>
+          <div class="password-item-check">
+            <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>

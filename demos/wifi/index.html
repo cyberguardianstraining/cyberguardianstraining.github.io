@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding Public WiFi Security</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .icon-shield::before { content: '🛡️'; }
+        .icon-wifi::before { content: '📶'; }
+        .icon-alert::before { content: '⚠️'; }
+        .icon-eye::before { content: '👁️'; }
+        .icon-lock::before { content: '🔒'; }
+        .icon-unlock::before { content: '🔓'; }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 mb-6">
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h1 class="text-4xl font-bold text-gray-900">Understanding Public WiFi Security</h1>
+                    <div class="text-2xl font-semibold text-blue-600" id="step-indicator">
+                        Step 1 of 7
+                    </div>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-4">
+                    <div id="progress-bar" class="bg-blue-600 h-4 rounded-full transition-all duration-500" style="width: 14.28%"></div>
+                </div>
+            </div>
+
+            <div id="content-area" class="min-h-[500px]">
+                <!-- Content will be dynamically inserted here -->
+            </div>
+
+            <div class="flex justify-between items-center mt-8 pt-6 border-t-2">
+                <button id="back-btn" onclick="goBack()" disabled class="px-8 py-4 text-xl font-semibold rounded-xl border-2 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                    ← Back
+                </button>
+                
+                <button id="next-btn" onclick="goNext()" class="px-8 py-4 text-xl font-semibold rounded-xl bg-blue-500 text-white hover:bg-blue-600 transition-all">
+                    Next →
+                </button>
+
+                <button id="restart-btn" onclick="restart()" style="display: none;" class="px-8 py-4 text-xl font-semibold rounded-xl bg-green-500 text-white hover:bg-green-600 transition-all">
+                    Start Again
+                </button>
+            </div>
+        </div>
+
+        <div class="text-center text-gray-600 text-lg">
+            <p>💡 Tip: Take your time on each step to understand the risks</p>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        let selectedNetwork = null;
+        let currentTip = 0;
+        const totalSteps = 7;
+
+        const networks = [
+            { name: "Purple Lane Bakery", safe: true },
+            { name: "PurpleLane_Free_WiFi", safe: false },
+            { name: "Purple Lane Bakery Guest", safe: false },
+            { name: "Free WiFi", safe: false }
+        ];
+
+        const safetyTips = [
+            { 
+                title: "Only connect to WiFi networks you know and trust",
+                example: "Ask the staff: 'What's your official WiFi name and password?'",
+                icon: "🔐"
+            },
+            { 
+                title: "Be suspicious of networks without passwords",
+                example: "Most businesses protect their WiFi with a password",
+                icon: "⚠️"
+            },
+            { 
+                title: "Avoid networks with names like 'FREE WiFi' or 'Public WiFi'",
+                example: "These generic names are often used by criminals",
+                icon: "🚫"
+            },
+            { 
+                title: "Don't do banking or shopping on public WiFi",
+                example: "Wait until you're home or use your phone's data instead",
+                icon: "🏦"
+            },
+            { 
+                title: "Use your phone's cellular data when possible",
+                example: "Your phone's 4G/5G data is much safer than public WiFi",
+                icon: "📱"
+            },
+            { 
+                title: "Look for the lock icon - secure networks require passwords",
+                example: "Password-protected networks are safer than open ones",
+                icon: "🔒"
+            }
+        ];
+
+        function updateProgress() {
+            const percentage = ((currentStep + 1) / totalSteps) * 100;
+            document.getElementById('progress-bar').style.width = percentage + '%';
+            document.getElementById('step-indicator').textContent = `Step ${currentStep + 1} of ${totalSteps}`;
+            
+            document.getElementById('back-btn').disabled = currentStep === 0;
+            
+            if (currentStep === totalSteps - 1) {
+                document.getElementById('next-btn').style.display = 'none';
+                document.getElementById('restart-btn').style.display = 'block';
+            } else {
+                document.getElementById('next-btn').style.display = 'block';
+                document.getElementById('restart-btn').style.display = 'none';
+            }
+        }
+
+        function renderStep0() {
+            return `
+                <div class="text-center space-y-6">
+                    <div class="flex justify-center">
+                        <div class="bg-blue-100 p-8 rounded-full">
+                            <span class="text-8xl">📶</span>
+                        </div>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-800">Welcome to WiFi Safety</h2>
+                    <p class="text-xl text-gray-700 leading-relaxed">
+                        This interactive demo will teach you how to safely use public WiFi networks and protect yourself from fake networks set up by criminals.
+                    </p>
+                </div>
+            `;
+        }
+
+        function renderStep1() {
+            return `
+                <div class="space-y-6">
+                    <h2 class="text-3xl font-bold text-gray-800 text-center">Choose a WiFi Network</h2>
+                    <p class="text-xl text-gray-700 text-center">
+                        You're at Purple Lane Bakery. Which network would you connect to?
+                    </p>
+                    <div class="space-y-4 mt-8">
+                        ${networks.map((network, idx) => `
+                            <button onclick="selectNetwork(${idx})" class="w-full p-6 border-4 border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all flex items-center justify-between text-left">
+                                <div class="flex items-center space-x-4">
+                                    <span class="text-5xl">📶</span>
+                                    <div>
+                                        <div class="text-2xl font-semibold text-gray-800">${network.name}</div>
+                                        ${network.safe ? `
+                                            <div class="flex items-center space-x-2 text-green-600 mt-1">
+                                                <span class="text-2xl">🔒</span>
+                                                <span class="text-lg">Password Protected</span>
+                                            </div>
+                                        ` : `
+                                            <div class="flex items-center space-x-2 text-orange-600 mt-1">
+                                                <span class="text-2xl">🔓</span>
+                                                <span class="text-lg">No Password</span>
+                                            </div>
+                                        `}
+                                    </div>
+                                </div>
+                                <div class="text-4xl text-gray-400">›</div>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderStep2() {
+            const network = networks[selectedNetwork];
+            return `
+                <div class="space-y-6 text-center">
+                    <div class="flex justify-center">
+                        <div class="${network.safe ? 'bg-green-100' : 'bg-red-100'} p-8 rounded-full">
+                            <span class="text-8xl">${network.safe ? '🛡️' : '⚠️'}</span>
+                        </div>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-800">You Selected: ${network.name}</h2>
+                    <p class="text-xl text-gray-700 leading-relaxed">
+                        ${network.safe 
+                            ? "This network is password-protected. However, IMPORTANT: Always check with the staff to confirm this is their official WiFi network. Password-protected doesn't always mean secure - criminals can also create password-protected fake networks! Always verify with staff first."
+                            : "This could be a rogue WiFi network - a fake network set up by a criminal! Criminals create these fake networks with names that look similar to real businesses. Once you connect, they can see everything you do online - your passwords, banking information, and personal messages. IMPORTANT: Always check with staff to confirm the official WiFi network name before connecting."}
+                    </p>
+                </div>
+            `;
+        }
+
+        function renderStep3() {
+            const network = networks[selectedNetwork];
+            return `
+                <div class="space-y-6">
+                    <div class="flex justify-center">
+                        <div class="bg-orange-100 p-8 rounded-full">
+                            <span class="text-8xl">⚠️</span>
+                        </div>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-800 text-center">Important Warning About WiFi Security</h2>
+                    <p class="text-xl text-gray-700 text-center mb-6">
+                        Before we continue, here are two critical things you need to know:
+                    </p>
+                    
+                    <div class="space-y-5">
+                        <div class="bg-red-50 border-4 border-red-400 rounded-xl p-6">
+                            <div class="flex items-start space-x-4">
+                                <div class="text-5xl flex-shrink-0">🎭</div>
+                                <div>
+                                    <h3 class="text-2xl font-bold text-gray-800 mb-3">
+                                        1. Password-Protected Networks Can Still Be Fake
+                                    </h3>
+                                    <p class="text-xl text-gray-700 leading-relaxed">
+                                        Criminals can create password-protected fake WiFi networks too! Just because a network requires a password doesn't mean it's safe. The network you selected (${network.name}) could be legitimate OR it could be a fake network created by a criminal. This is why you must ALWAYS verify the network name with staff.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-orange-50 border-4 border-orange-400 rounded-xl p-6">
+                            <div class="flex items-start space-x-4">
+                                <div class="text-5xl flex-shrink-0">🔓</div>
+                                <div>
+                                    <h3 class="text-2xl font-bold text-gray-800 mb-3">
+                                        2. Even Genuine WiFi Networks Can Be Compromised
+                                    </h3>
+                                    <p class="text-xl text-gray-700 leading-relaxed">
+                                        Even if you're connected to the real Purple Lane Bakery WiFi, public networks can still be risky. Other people on the same network might be able to see your activity, or the network itself might have security weaknesses. This is why you should never do banking, shopping, or enter passwords on public WiFi.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-100 border-4 border-blue-400 rounded-xl p-6 mt-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="text-4xl flex-shrink-0">💡</div>
+                            <p class="text-xl font-bold text-blue-900">
+                                Bottom Line: Public WiFi is convenient, but it's never completely safe. Always be cautious about what you do online when using it!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderStep4() {
+            return `
+                <div class="space-y-6">
+                    <div class="flex justify-center">
+                        <div class="bg-red-100 p-8 rounded-full">
+                            <span class="text-8xl">👁️</span>
+                        </div>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-800 text-center">The Hidden Danger</h2>
+                    <div class="bg-red-50 border-4 border-red-300 rounded-xl p-6">
+                        <p class="text-xl text-gray-800 leading-relaxed">
+                            When you connect to a rogue WiFi network, a criminal can see everything you do online.
+                        </p>
+                        <p class="text-xl text-gray-800 leading-relaxed mt-4">
+                            It's like someone standing behind you at an ATM, watching you type your PIN number!
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderStep5() {
+            return `
+                <div class="space-y-6">
+                    <h2 class="text-3xl font-bold text-gray-800 text-center">What Criminals Can Steal</h2>
+                    <div class="grid gap-4">
+                        <div class="bg-red-50 border-4 border-red-300 rounded-xl p-5 flex items-center space-x-4">
+                            <div class="text-5xl">🔑</div>
+                            <div>
+                                <div class="text-2xl font-bold text-gray-800">Passwords</div>
+                                <div class="text-lg text-gray-700">Email, social media, online accounts</div>
+                            </div>
+                        </div>
+                        <div class="bg-red-50 border-4 border-red-300 rounded-xl p-5 flex items-center space-x-4">
+                            <div class="text-5xl">💳</div>
+                            <div>
+                                <div class="text-2xl font-bold text-gray-800">Credit Cards</div>
+                                <div class="text-lg text-gray-700">Card numbers and security codes</div>
+                            </div>
+                        </div>
+                        <div class="bg-red-50 border-4 border-red-300 rounded-xl p-5 flex items-center space-x-4">
+                            <div class="text-5xl">🏦</div>
+                            <div>
+                                <div class="text-2xl font-bold text-gray-800">Bank Info</div>
+                                <div class="text-lg text-gray-700">Account numbers and balances</div>
+                            </div>
+                        </div>
+                        <div class="bg-red-50 border-4 border-red-300 rounded-xl p-5 flex items-center space-x-4">
+                            <div class="text-5xl">📧</div>
+                            <div>
+                                <div class="text-2xl font-bold text-gray-800">Personal Emails</div>
+                                <div class="text-lg text-gray-700">Private messages and attachments</div>
+                            </div>
+                        </div>
+                        <div class="bg-red-50 border-4 border-red-300 rounded-xl p-5 flex items-center space-x-4">
+                            <div class="text-5xl">📱</div>
+                            <div>
+                                <div class="text-2xl font-bold text-gray-800">Phone Numbers</div>
+                                <div class="text-lg text-gray-700">Contacts and personal information</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderStep6() {
+            const tip = safetyTips[currentTip];
+            const isLastTip = currentTip === safetyTips.length - 1;
+            
+            return `
+                <div class="space-y-6">
+                    <div class="flex justify-center">
+                        <div class="bg-green-100 p-8 rounded-full">
+                            <span class="text-8xl">🛡️</span>
+                        </div>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-800 text-center">How to Stay Safe</h2>
+                    
+                    <div class="bg-white border-4 border-gray-300 rounded-xl p-4">
+                        <div class="text-center text-xl font-semibold text-gray-600 mb-4">
+                            Safety Tip ${currentTip + 1} of ${safetyTips.length}
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="bg-green-500 h-3 rounded-full transition-all duration-500" style="width: ${((currentTip + 1) / safetyTips.length) * 100}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 border-4 border-green-400 rounded-2xl p-8 min-h-[300px] flex flex-col justify-center">
+                        <div class="text-center mb-6">
+                            <div class="text-7xl mb-4">${tip.icon}</div>
+                            <h3 class="text-3xl font-bold text-gray-800 mb-6 leading-relaxed">
+                                ${tip.title}
+                            </h3>
+                        </div>
+                        
+                        <div class="bg-white border-4 border-green-300 rounded-xl p-6">
+                            <div class="flex items-start space-x-3">
+                                <div class="text-3xl flex-shrink-0">💡</div>
+                                <div>
+                                    <div class="text-lg font-semibold text-green-800 mb-2">Example:</div>
+                                    <p class="text-xl text-gray-700 leading-relaxed">
+                                        ${tip.example}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-4">
+                        <button onclick="previousTip()" ${currentTip === 0 ? 'disabled' : ''} class="px-8 py-4 text-xl font-semibold rounded-xl border-2 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                            ← Previous Tip
+                        </button>
+                        
+                        ${!isLastTip ? `
+                            <button onclick="nextTip()" class="px-8 py-4 text-xl font-semibold rounded-xl bg-green-500 text-white hover:bg-green-600 transition-all">
+                                Next Tip →
+                            </button>
+                        ` : `
+                            <div class="bg-gradient-to-r from-green-400 to-blue-500 border-4 border-green-500 rounded-xl px-8 py-4">
+                                <p class="text-xl font-bold text-white">
+                                    🎉 You've learned all the tips!
+                                </p>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderContent() {
+            const contentArea = document.getElementById('content-area');
+            
+            switch(currentStep) {
+                case 0:
+                    contentArea.innerHTML = renderStep0();
+                    break;
+                case 1:
+                    contentArea.innerHTML = renderStep1();
+                    break;
+                case 2:
+                    contentArea.innerHTML = renderStep2();
+                    break;
+                case 3:
+                    contentArea.innerHTML = renderStep3();
+                    break;
+                case 4:
+                    contentArea.innerHTML = renderStep4();
+                    break;
+                case 5:
+                    contentArea.innerHTML = renderStep5();
+                    break;
+                case 6:
+                    contentArea.innerHTML = renderStep6();
+                    break;
+            }
+            
+            updateProgress();
+        }
+
+        function selectNetwork(index) {
+            selectedNetwork = index;
+            currentStep = 2;
+            renderContent();
+        }
+
+        function goNext() {
+            if (currentStep === 1 && selectedNetwork === null) {
+                alert("Please select a WiFi network first!");
+                return;
+            }
+            if (currentStep < totalSteps - 1) {
+                currentStep++;
+                renderContent();
+            }
+        }
+
+        function goBack() {
+            if (currentStep > 0) {
+                currentStep--;
+                renderContent();
+            }
+        }
+
+        function restart() {
+            currentStep = 0;
+            selectedNetwork = null;
+            currentTip = 0;
+            renderContent();
+        }
+
+        function nextTip() {
+            if (currentTip < safetyTips.length - 1) {
+                currentTip++;
+                renderContent();
+            }
+        }
+
+        function previousTip() {
+            if (currentTip > 0) {
+                currentTip--;
+                renderContent();
+            }
+        }
+
+        // Initialize
+        renderContent();
+    </script>
+</body>
+</html>
