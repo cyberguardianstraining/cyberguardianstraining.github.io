@@ -1,357 +1,512 @@
 ---
 layout: default
-title: Cloud Storage
+title: "Cloud Storage"
 ---
 
 
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Cloud Storage</title>
   <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%);
+      min-height: 100vh; color: #333; line-height: 1.6;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 32px;}
+    
+    h1 { font-size: 42px; font-weight: 700; text-align: center; margin-bottom: 16px; color: #312e81; }
+    .subtitle { text-align: center; font-size: 20px; color: #374151; margin-bottom: 32px; }
+
+    .controls { display: flex; justify-content: center; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
+    .btn {
+      padding: 16px 32px; font-size: 18px; font-weight: 700; border: none;
+      border-radius: 12px; cursor: pointer; transition: all 0.3s ease;
+      display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    }
+    .btn:disabled { background: #d1d5db; cursor: not-allowed; }
+    .btn-prev { background: #4b5563; color: white; }
+    .btn-prev:hover:not(:disabled) { background: #374151; }
+    .btn-next { background: #4f46e5; color: white; }
+    .btn-next:hover:not(:disabled) { background: #4338ca; }
+    .btn-reset { background: #2563eb; color: white; }
+    .btn-reset:hover { background: #1d4ed8; }
+    .btn svg { width: 24px; height: 24px; }
+
+    .step-info {
+      background: white; border-radius: 16px; padding: 32px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 32px;
+    }
+    .step-header { display: flex; align-items: flex-start; gap: 24px; }
+    .step-number {
+      background: #4f46e5; color: white; border-radius: 50%;
+      width: 64px; height: 64px; display: flex; align-items: center; justify-content: center;
+      font-size: 24px; font-weight: 700; flex-shrink: 0;
+    }
+    .step-title { font-size: 28px; font-weight: 700; color: #312e81; margin-bottom: 16px; }
+    .step-desc { font-size: 20px; color: #374151; line-height: 1.7; }
+
+    .progress { display: flex; gap: 12px; margin-top: 32px; }
+    .progress-dot { flex: 1; height: 16px; border-radius: 8px; background: #d1d5db; transition: background 0.5s ease; }
+    .progress-dot.active { background: #4f46e5; }
+
+    .animation-stage {
+      background: white; border-radius: 16px; padding: 48px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12); margin-bottom: 32px;
+      min-height: 450px; position: relative; overflow: hidden;
+    }
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 48px; align-items: center; height: 100%; }
+
+    .panel {
+      border-radius: 16px; padding: 32px; text-align: center;
+      border: 4px solid; transition: all 0.7s ease;
+    }
+    .panel-title { font-size: 24px; font-weight: 700; margin-bottom: 24px; }
+    
+    .panel-devices { background: #faf5ff; border-color: #e9d5ff; }
+    .panel-devices.active { border-color: #a855f7; }
+    .panel-devices .panel-title { color: #581c87; }
+    
+    .panel-internet { background: #f0fdf4; border-color: #bbf7d0; }
+    .panel-internet.active { border-color: #22c55e; }
+    .panel-internet .panel-title { color: #14532d; }
+    
+    .panel-cloud { background: #eff6ff; border-color: #bfdbfe; }
+    .panel-cloud.active { border-color: #3b82f6; }
+    .panel-cloud .panel-title { color: #1e3a8a; }
+
+    .panel.active { animation: gentle-pulse 3s ease-in-out infinite; }
     @keyframes gentle-pulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.05); opacity: 0.9; }
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+
+    .device-icon {
+      background: #f3e8ff; padding: 24px; border-radius: 12px; margin-bottom: 16px;
+      display: inline-block; transition: transform 0.3s ease;
+    }
+    .device-icon:hover { transform: scale(1.1); }
+    .device-icon svg { width: 64px; height: 64px; stroke: #9333ea; fill: none; stroke-width: 1.5; }
+
+    .internet-globe { width: 112px; height: 112px; stroke: #22c55e; fill: none; stroke-width: 1.5; margin-bottom: 24px; }
+    .internet-lock { width: 48px; height: 48px; stroke: #16a34a; fill: none; stroke-width: 2; margin-bottom: 12px; }
+    .secure-text { font-size: 18px; font-weight: 600; color: #15803d; }
+
+    .cloud-container { position: relative; min-height: 180px; display: flex; align-items: center; justify-content: center; }
+    .cloud-icon { width: 192px; height: 192px; stroke: #60a5fa; fill: none; stroke-width: 1; }
+    .cloud-inner { position: absolute; display: flex; gap: 12px; }
+    .cloud-inner svg { width: 40px; height: 40px; stroke: #1d4ed8; fill: none; stroke-width: 1.5; }
+    .cloud-inner.bouncing svg { animation: bounce 1s infinite; }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* Encrypted tunnel - overlay on internet panel */
+    .encrypted-tunnel {
+      position: absolute; top: 50%; left: 50%; 
+      width: 280px; height: 180px;
+      transform: translate(-50%, -50%);
+      background: rgba(240, 253, 244, 0.95);
+      border: 4px solid #22c55e;
+      border-radius: 16px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.5s ease; z-index: 15;
+      box-shadow: 0 8px 32px rgba(34, 197, 94, 0.3);
+    }
+    .encrypted-tunnel.visible { opacity: 1; }
+    .tunnel-label {
+      background: #22c55e; color: white; padding: 8px 16px;
+      border-radius: 12px; font-size: 14px; font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .tunnel-lines {
+      width: 100%; display: flex; flex-direction: column; gap: 8px;
+      padding: 0 20px;
+    }
+    .tunnel-line {
+      height: 3px; background: repeating-linear-gradient(90deg, #22c55e 0px, #22c55e 8px, transparent 8px, transparent 16px);
+      animation: tunnelFlow 1s linear infinite;
+    }
+    .tunnel-line:nth-child(2) { animation-delay: 0.3s; }
+    .tunnel-line:nth-child(3) { animation-delay: 0.6s; }
+    @keyframes tunnelFlow {
+      from { background-position: 0 0; }
+      to { background-position: 16px 0; }
+    }
+    .tunnel-lock {
+      margin-top: 12px;
+    }
+    .tunnel-lock svg {
+      width: 32px; height: 32px; stroke: #16a34a; fill: none; stroke-width: 2;
     }
     
-    .active-step {
-      animation: gentle-pulse 3s ease-in-out infinite;
+    /* Blur internet panel when tunnel is visible */
+    .panel-internet.blurred {
+      filter: blur(3px);
+      opacity: 0.5;
     }
 
-    @keyframes fileToCloud {
-      0% { 
-        left: 10%;
-        opacity: 0;
-        transform: translateY(0);
-      }
-      10% {
-        opacity: 1;
-      }
-      50% {
-        left: 50%;
-        transform: translateY(-30px);
-      }
-      90% {
-        opacity: 1;
-      }
-      100% {
-        left: 90%;
-        opacity: 0;
-        transform: translateY(0);
-      }
+    /* File transfer animations */
+    .file-transfer {
+      position: absolute; top: 50%; left: 0; right: 0; height: 4px;
+      transform: translateY(-50%); pointer-events: none; z-index: 10;
+    }
+    .file-packet {
+      position: absolute; padding: 12px 16px; border-radius: 8px;
+      display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      font-size: 14px; font-weight: 600; color: white; font-family: monospace;
+    }
+    .file-packet svg { width: 24px; height: 24px; stroke: white; fill: none; stroke-width: 2; }
+    
+    /* To cloud animation - 3 phases */
+    .file-packet.to-cloud-start {
+      background: #3b82f6;
+      animation: toCloudStart 1.5s ease-in forwards;
+    }
+    .file-packet.to-cloud-encrypted {
+      background: #22c55e;
+      animation: toCloudMiddle 1.5s ease-in-out forwards;
+      animation-delay: 1.5s;
+      opacity: 0;
+    }
+    .file-packet.to-cloud-end {
+      background: #3b82f6;
+      animation: toCloudEnd 1.5s ease-out forwards;
+      animation-delay: 3s;
+      opacity: 0;
     }
 
-    @keyframes fileFromCloud {
-      0% { 
-        left: 90%;
-        opacity: 0;
-        transform: translateY(0);
-      }
-      10% {
-        opacity: 1;
-      }
-      50% {
-        left: 50%;
-        transform: translateY(-30px);
-      }
-      90% {
-        opacity: 1;
-      }
-      100% {
-        left: 10%;
-        opacity: 0;
-        transform: translateY(0);
-      }
+    @keyframes toCloudStart {
+      0% { left: 8%; opacity: 1; }
+      100% { left: 33%; opacity: 0; }
+    }
+    @keyframes toCloudMiddle {
+      0% { left: 33%; opacity: 1; }
+      100% { left: 60%; opacity: 0; }
+    }
+    @keyframes toCloudEnd {
+      0% { left: 60%; opacity: 1; }
+      100% { left: 85%; opacity: 0; }
     }
 
-    .file-to-cloud {
-      animation: fileToCloud 3s ease-in-out infinite;
+    /* From cloud animation - 3 phases */
+    .file-packet.from-cloud-start {
+      background: #3b82f6;
+      animation: fromCloudStart 1.5s ease-in forwards;
+    }
+    .file-packet.from-cloud-encrypted {
+      background: #22c55e;
+      animation: fromCloudMiddle 1.5s ease-in-out forwards;
+      animation-delay: 1.5s;
+      opacity: 0;
+    }
+    .file-packet.from-cloud-end {
+      background: #3b82f6;
+      animation: fromCloudEnd 1.5s ease-out forwards;
+      animation-delay: 3s;
+      opacity: 0;
     }
 
-    .file-from-cloud {
-      animation: fileFromCloud 3s ease-in-out infinite;
+    @keyframes fromCloudStart {
+      0% { left: 85%; opacity: 1; }
+      100% { left: 60%; opacity: 0; }
+    }
+    @keyframes fromCloudMiddle {
+      0% { left: 60%; opacity: 1; }
+      100% { left: 33%; opacity: 0; }
+    }
+    @keyframes fromCloudEnd {
+      0% { left: 33%; opacity: 1; }
+      100% { left: 8%; opacity: 0; }
     }
 
-    @keyframes bounce {
-      0%, 100% {
-        transform: translateY(-25%);
-        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-      }
-      50% {
-        transform: translateY(0);
-        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-      }
+    /* Looping version for continuous display */
+    .file-loop-container {
+      position: absolute; top: 50%; left: 0; right: 0;
+      transform: translateY(-50%); pointer-events: none; z-index: 20;
+    }
+    .file-packet.loop-to-cloud {
+      background: #3b82f6;
+      animation: loopToCloud 7s ease-in-out infinite;
+    }
+    .file-packet.loop-from-cloud {
+      background: #3b82f6;
+      animation: loopFromCloud 7s ease-in-out infinite;
     }
 
-    .animate-bounce {
-      animation: bounce 1s infinite;
+    @keyframes loopToCloud {
+      0% { left: 8%; opacity: 0; background: #3b82f6; }
+      5% { left: 8%; opacity: 1; }
+      30% { left: 33%; background: #3b82f6; }
+      35% { left: 38%; background: #22c55e; }
+      65% { left: 55%; background: #22c55e; }
+      70% { left: 60%; background: #3b82f6; }
+      95% { left: 85%; opacity: 1; }
+      100% { left: 85%; opacity: 0; background: #3b82f6; }
+    }
+    @keyframes loopFromCloud {
+      0% { left: 85%; opacity: 0; background: #3b82f6; }
+      5% { left: 85%; opacity: 1; }
+      30% { left: 60%; background: #3b82f6; }
+      35% { left: 55%; background: #22c55e; }
+      65% { left: 38%; background: #22c55e; }
+      70% { left: 33%; background: #3b82f6; }
+      95% { left: 8%; opacity: 1; }
+      100% { left: 8%; opacity: 0; background: #3b82f6; }
+    }
+
+    .benefits { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+    .benefit {
+      background: white; padding: 32px; border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08); text-align: center;
+      transition: box-shadow 0.3s ease;
+    }
+    .benefit:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+    .benefit svg { width: 56px; height: 56px; margin-bottom: 16px; fill: none; stroke-width: 1.5; }
+    .benefit h4 { font-size: 20px; font-weight: 700; color: #111827; margin-bottom: 12px; }
+    .benefit p { font-size: 18px; color: #4b5563; }
+
+    @media (max-width: 900px) {
+      body { padding: 16px; }
+      h1 { font-size: 28px; }
+      .grid { grid-template-columns: 1fr; gap: 24px; }
+      .benefits { grid-template-columns: 1fr; }
+      .btn { padding: 12px 20px; font-size: 16px; }
+      .animation-stage { padding: 24px; min-height: auto; }
+      .encrypted-tunnel { display: none; }
     }
   </style>
 
-<div class="bg-gradient-to-br from-blue-50 to-indigo-100">
-  <div class="w-full min-h-screen p-8">
-    <div class="max-w-6xl mx-auto">
-      <h1 class="text-5xl font-bold text-center mb-4 text-indigo-900">
-        Cloud Storage
-      </h1>
-      <p class="text-center text-xl text-gray-700 mb-8">
-        Use the buttons below to move through each step at your own pace
-      </p>
+  <div class="container">
+    <h1>How Cloud Computing Works</h1>
+    <p class="subtitle">Use the buttons below to move through each step at your own pace</p>
 
-      <!-- Control Buttons -->
-      <div class="flex justify-center gap-4 mb-8 flex-wrap">
-        <button id="prevBtn" class="bg-gray-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-lg flex items-center gap-2">
-          Previous
-        </button>
-        
-        <button id="nextBtn" class="bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-lg flex items-center gap-2">
-          Next
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
-          </svg>
-        </button>
-        
-        <button id="resetBtn" class="bg-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition-colors shadow-lg flex items-center gap-2">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-          </svg>
-          Start Again
-        </button>
-      </div>
+    <div class="controls">
+      <button class="btn btn-prev" id="prevBtn" disabled>Previous</button>
+      <button class="btn btn-next" id="nextBtn">
+        Next
+        <svg viewBox="0 0 24 24"><path d="M5 4l10 8-10 8V4z" fill="currentColor"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></svg>
+      </button>
+      <button class="btn btn-reset" id="resetBtn">
+        <svg viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6" stroke="currentColor" stroke-width="2" fill="none"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        Start Over
+      </button>
+    </div>
 
-      <!-- Step Information -->
-      <div class="bg-white rounded-2xl p-8 shadow-xl mb-8">
-        <div class="flex items-start space-x-6">
-          <div id="stepNumber" class="bg-indigo-600 text-white rounded-full w-16 h-16 flex items-center justify-center font-bold text-2xl flex-shrink-0">
-            1
-          </div>
-          <div>
-            <h3 id="stepTitle" class="text-3xl font-bold text-indigo-900 mb-4">
-              Your Devices
-            </h3>
-            <p id="stepDescription" class="text-xl text-gray-700 leading-relaxed">
-              You can use cloud services from any device - your computer, phone, or tablet. All you need is an internet connection, and you can access your files and programs from anywhere.
-            </p>
-          </div>
+    <div class="step-info">
+      <div class="step-header">
+        <div class="step-number" id="stepNumber">1</div>
+        <div>
+          <div class="step-title" id="stepTitle">Your Devices</div>
+          <div class="step-desc" id="stepDesc">You can use cloud services from any device - your computer, phone, or tablet. All you need is an internet connection, and you can access your files and programs from anywhere.</div>
         </div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
 
-        <div class="flex gap-3 mt-8">
-          <div id="progress0" class="h-4 flex-1 rounded-full bg-indigo-600 transition-colors duration-500"></div>
-          <div id="progress1" class="h-4 flex-1 rounded-full bg-gray-300 transition-colors duration-500"></div>
-          <div id="progress2" class="h-4 flex-1 rounded-full bg-gray-300 transition-colors duration-500"></div>
-          <div id="progress3" class="h-4 flex-1 rounded-full bg-gray-300 transition-colors duration-500"></div>
-          <div id="progress4" class="h-4 flex-1 rounded-full bg-gray-300 transition-colors duration-500"></div>
+    <div class="animation-stage">
+      <!-- Encrypted tunnel - overlay on internet panel -->
+      <div class="encrypted-tunnel" id="encryptedTunnel">
+        <span class="tunnel-label">🔒 ENCRYPTED TUNNEL</span>
+        <div class="tunnel-lines">
+          <div class="tunnel-line"></div>
+          <div class="tunnel-line"></div>
+          <div class="tunnel-line"></div>
+        </div>
+        <div class="tunnel-lock">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>
       </div>
 
-      <!-- Animation Area -->
-      <div class="relative bg-white rounded-2xl p-12 shadow-2xl mb-8" style="min-height: 450px;">
-        <!-- File Transfer Animations -->
-        <div id="fileToCloud" class="absolute top-1/2 left-0 right-0 h-2 pointer-events-none hidden" style="transform: translateY(-50%);">
-          <div class="file-to-cloud absolute bg-blue-500 rounded-lg p-3 shadow-lg flex items-center gap-2">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-            <span class="text-white font-semibold text-sm">Photo.jpg</span>
+      <!-- File transfer animation container -->
+      <div class="file-loop-container" id="fileTransfer"></div>
+
+      <div class="grid">
+        <!-- Devices Panel -->
+        <div class="panel panel-devices active" id="panelDevices">
+          <div class="panel-title">Your Devices</div>
+          <div class="device-icon">
+            <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+          </div>
+          <div class="device-icon">
+            <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+          <div class="device-icon">
+            <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
           </div>
         </div>
 
-        <div id="fileFromCloud" class="absolute top-1/2 left-0 right-0 h-2 pointer-events-none hidden" style="transform: translateY(-50%);">
-          <div class="file-from-cloud absolute bg-green-500 rounded-lg p-3 shadow-lg flex items-center gap-2">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-            <span class="text-white font-semibold text-sm">Photo.jpg</span>
-          </div>
+        <!-- Internet Panel -->
+        <div class="panel panel-internet" id="panelInternet">
+          <div class="panel-title">Internet</div>
+          <svg class="internet-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <svg class="internet-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <div class="secure-text">Secure Connection</div>
         </div>
 
-        <div class="grid grid-cols-3 gap-12 items-center h-full">
-          <!-- Left: User Devices -->
-          <div id="devicesBox" class="bg-purple-50 border-4 border-purple-400 active-step rounded-2xl p-8 transition-all duration-700">
-            <div class="flex flex-col items-center space-y-8">
-              <div class="text-center">
-                <h3 class="font-bold text-2xl text-purple-900 mb-6">Your Devices</h3>
-                <div class="flex flex-col space-y-6">
-                  <div class="bg-purple-100 p-6 rounded-xl hover:scale-110 transition-transform">
-                    <svg class="w-16 h-16 text-purple-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke-width="2"></rect>
-                      <line x1="8" y1="21" x2="16" y2="21" stroke-width="2"></line>
-                      <line x1="12" y1="17" x2="12" y2="21" stroke-width="2"></line>
-                    </svg>
-                  </div>
-                  <div class="bg-purple-100 p-6 rounded-xl hover:scale-110 transition-transform">
-                    <svg class="w-16 h-16 text-purple-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <rect x="5" y="2" width="14" height="20" rx="2" ry="2" stroke-width="2"></rect>
-                      <line x1="12" y1="18" x2="12.01" y2="18" stroke-width="2"></line>
-                    </svg>
-                  </div>
-                  <div class="bg-purple-100 p-6 rounded-xl hover:scale-110 transition-transform">
-                    <svg class="w-16 h-16 text-purple-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke-width="2"></rect>
-                      <line x1="8" y1="21" x2="16" y2="21" stroke-width="2"></line>
-                      <line x1="12" y1="17" x2="12" y2="21" stroke-width="2"></line>
-                    </svg>
-                  </div>
-                </div>
-              </div>
+        <!-- Cloud Panel -->
+        <div class="panel panel-cloud" id="panelCloud">
+          <div class="panel-title">Cloud Data Center</div>
+          <div class="cloud-container">
+            <svg class="cloud-icon" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+            <div class="cloud-inner" id="cloudInner">
+              <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+              <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
             </div>
           </div>
-
-          <!-- Center: Internet -->
-          <div id="internetBox" class="bg-green-50 border-4 border-green-200 rounded-2xl p-8 transition-all duration-700">
-            <div class="flex flex-col items-center">
-              <h3 class="font-bold text-2xl text-green-900 mb-6">Internet</h3>
-              <svg class="w-28 h-28 text-green-500 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
-                <line x1="2" y1="12" x2="22" y2="12" stroke-width="2"></line>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke-width="2"></path>
-              </svg>
-              <svg class="w-12 h-12 text-green-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke-width="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke-width="2"></path>
-              </svg>
-              <p class="text-lg text-center font-semibold text-green-700">Secure Connection</p>
-            </div>
-          </div>
-
-          <!-- Right: Cloud -->
-          <div id="cloudBox" class="bg-blue-50 border-4 border-blue-200 rounded-2xl p-8 transition-all duration-700">
-            <div class="flex flex-col items-center space-y-8">
-              <div class="text-center">
-                <h3 class="font-bold text-2xl text-blue-900 mb-6">Cloud Data Center</h3>
-                <div class="relative flex items-center justify-center" style="min-height: 180px;">
-                  <svg class="w-48 h-48 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
-                  </svg>
-                  <div class="absolute inset-0 flex items-center justify-center space-x-3">
-                    <svg id="serverIcon" class="w-10 h-10 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <rect x="2" y="2" width="20" height="8" rx="2" ry="2" stroke-width="2"></rect>
-                      <rect x="2" y="14" width="20" height="8" rx="2" ry="2" stroke-width="2"></rect>
-                      <line x1="6" y1="6" x2="6.01" y2="6" stroke-width="2"></line>
-                      <line x1="6" y1="18" x2="6.01" y2="18" stroke-width="2"></line>
-                    </svg>
-                    <svg id="databaseIcon" class="w-10 h-10 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <ellipse cx="12" cy="5" rx="9" ry="3" stroke-width="2"></ellipse>
-                      <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" stroke-width="2"></path>
-                      <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" stroke-width="2"></path>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Key Benefits -->
-      <div class="grid grid-cols-3 gap-6">
-        <div class="bg-white p-8 rounded-xl shadow-lg text-center hover:shadow-xl transition-shadow">
-          <svg class="w-14 h-14 text-blue-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
-            <line x1="2" y1="12" x2="22" y2="12" stroke-width="2"></line>
-            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke-width="2"></path>
-          </svg>
-          <h4 class="font-bold text-xl text-gray-900 mb-3">Access Anywhere</h4>
-          <p class="text-lg text-gray-600">Work from any device, anywhere in the world</p>
-        </div>
-        <div class="bg-white p-8 rounded-xl shadow-lg text-center hover:shadow-xl transition-shadow">
-          <svg class="w-14 h-14 text-indigo-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <ellipse cx="12" cy="5" rx="9" ry="3" stroke-width="2"></ellipse>
-            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" stroke-width="2"></path>
-            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" stroke-width="2"></path>
-          </svg>
-          <h4 class="font-bold text-xl text-gray-900 mb-3">Scalable Storage</h4>
-          <p class="text-lg text-gray-600">Store your files without needing physical storage</p>
-        </div>
-        <div class="bg-white p-8 rounded-xl shadow-lg text-center hover:shadow-xl transition-shadow">
-          <svg class="w-14 h-14 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke-width="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke-width="2"></path>
-          </svg>
-          <h4 class="font-bold text-xl text-gray-900 mb-3">Secure & Reliable</h4>
-          <p class="text-lg text-gray-600">Your data is protected and backed up safely</p>
         </div>
       </div>
     </div>
-  </div>
+
+    <div class="benefits">
+      <div class="benefit">
+        <svg viewBox="0 0 24 24" stroke="#3b82f6"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <h4>Access Anywhere</h4>
+        <p>Work from any device, anywhere in the world</p>
+      </div>
+      <div class="benefit">
+        <svg viewBox="0 0 24 24" stroke="#6366f1"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        <h4>Scalable Storage</h4>
+        <p>Store your files without needing physical storage</p>
+      </div>
+      <div class="benefit">
+        <svg viewBox="0 0 24 24" stroke="#22c55e"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <h4>Secure & Reliable</h4>
+        <p>Your data is protected and backed up safely</p>
+      </div>
+    </div>
   </div>
 
   <script>
-    let activeStep = 0;
     const steps = [
-      {
-        title: "Your Devices",
-        description: "You can use cloud services from any device - your computer, phone, or tablet. All you need is an internet connection, and you can access your files and programs from anywhere."
-      },
-      {
-        title: "Internet Connection",
-        description: "When you use the cloud, your data travels safely through the internet. It's protected with security (like the lock symbol) so only you can access it."
-      },
-      {
-        title: "Cloud Data Centers",
-        description: "Your information is stored in large buildings called data centers. These have many powerful computers (servers) working together to keep your data safe."
-      },
-      {
-        title: "Data Storage",
-        description: "When you save a file to the cloud, it travels from your device through the internet to be stored safely on the cloud servers. Your photos, documents, and files are all kept secure."
-      },
-      {
-        title: "Data Retrieval",
-        description: "When you need your files, the cloud sends them back through the internet to your device instantly. Whether you're at home or traveling, your information is always available when you need it."
-      }
+      { title: "Your Devices", description: "You can use cloud services from any device - your computer, phone, or tablet. All you need is an internet connection, and you can access your files and programs from anywhere." },
+      { title: "Internet Connection", description: "When you use the cloud, your data travels safely through the internet. It's protected with encryption (like the lock symbol) so only you can access it. Your files are scrambled into unreadable code while traveling." },
+      { title: "Cloud Data Centers", description: "Your information is stored in large buildings called data centers. These have many powerful computers (servers) working together to keep your data safe." },
+      { title: "Data Storage", description: "When you save a file to the cloud, it gets encrypted (scrambled) as it travels through the internet. Watch how 'Photo.jpg' becomes scrambled text, then returns to normal when it arrives safely at the cloud servers." },
+      { title: "Data Retrieval", description: "When you need your files, the cloud sends them back through the encrypted tunnel. The file is scrambled during travel for security, then decrypted (unscrambled) when it reaches your device." }
     ];
+
+    let activeStep = 0;
+    let animationInterval = null;
+
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const stepNumber = document.getElementById('stepNumber');
+    const stepTitle = document.getElementById('stepTitle');
+    const stepDesc = document.getElementById('stepDesc');
+    const progress = document.getElementById('progress');
+    const panelDevices = document.getElementById('panelDevices');
+    const panelInternet = document.getElementById('panelInternet');
+    const panelCloud = document.getElementById('panelCloud');
+    const cloudInner = document.getElementById('cloudInner');
+    const fileTransfer = document.getElementById('fileTransfer');
+    const encryptedTunnel = document.getElementById('encryptedTunnel');
+
+    const fileIcon = `<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`;
+    const lockIcon = `<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
+
+    // Create progress dots
+    steps.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'progress-dot' + (i === 0 ? ' active' : '');
+      progress.appendChild(dot);
+    });
+
+    function createFileAnimation(direction) {
+      // Clear previous
+      fileTransfer.innerHTML = '';
+      if (animationInterval) {
+        clearInterval(animationInterval);
+        animationInterval = null;
+      }
+
+      const packet = document.createElement('div');
+      packet.className = `file-packet loop-${direction}`;
+      packet.innerHTML = `${fileIcon}<span class="file-label">📄 Photo.jpg</span>`;
+      fileTransfer.appendChild(packet);
+
+      const label = packet.querySelector('.file-label');
+      
+      // Slower animation - 7s cycle, update every 100ms = 70 phases
+      let phase = 0;
+      animationInterval = setInterval(() => {
+        phase = (phase + 1) % 70;
+        const progress = phase / 70;
+        
+        // Same logic for both directions - encrypt in middle
+        if (progress < 0.30 || progress > 0.70) {
+          label.textContent = '📄 Photo.jpg';
+        } else {
+          label.textContent = '🔐 x7$mK9#pL2';
+        }
+      }, 100);
+    }
 
     function updateUI() {
       // Update step info
-      document.getElementById('stepNumber').textContent = activeStep + 1;
-      document.getElementById('stepTitle').textContent = steps[activeStep].title;
-      document.getElementById('stepDescription').textContent = steps[activeStep].description;
-
-      // Update progress bars
-      for (let i = 0; i < 5; i++) {
-        const progressBar = document.getElementById(`progress${i}`);
-        progressBar.className = `h-4 flex-1 rounded-full transition-colors duration-500 ${
-          i <= activeStep ? 'bg-indigo-600' : 'bg-gray-300'
-        }`;
-      }
+      stepNumber.textContent = activeStep + 1;
+      stepTitle.textContent = steps[activeStep].title;
+      stepDesc.textContent = steps[activeStep].description;
 
       // Update buttons
-      document.getElementById('prevBtn').disabled = activeStep === 0;
-      document.getElementById('nextBtn').disabled = activeStep === 4;
+      prevBtn.disabled = activeStep === 0;
+      nextBtn.disabled = activeStep === steps.length - 1;
 
-      // Update box animations
-      const devicesBox = document.getElementById('devicesBox');
-      const internetBox = document.getElementById('internetBox');
-      const cloudBox = document.getElementById('cloudBox');
+      // Update progress
+      document.querySelectorAll('.progress-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i <= activeStep);
+      });
 
-      devicesBox.className = `bg-purple-50 border-4 ${activeStep === 0 || activeStep === 4 ? 'border-purple-400 active-step' : 'border-purple-200'} rounded-2xl p-8 transition-all duration-700`;
-      internetBox.className = `bg-green-50 border-4 ${activeStep === 1 ? 'border-green-400 active-step' : 'border-green-200'} rounded-2xl p-8 transition-all duration-700`;
-      cloudBox.className = `bg-blue-50 border-4 ${activeStep === 2 ? 'border-blue-400 active-step' : 'border-blue-200'} rounded-2xl p-8 transition-all duration-700`;
+      // Update panels
+      panelDevices.classList.remove('active');
+      panelInternet.classList.remove('active');
+      panelCloud.classList.remove('active');
+      cloudInner.classList.remove('bouncing');
 
-      // Update icons animations
-      const serverIcon = document.getElementById('serverIcon');
-      const databaseIcon = document.getElementById('databaseIcon');
-      
-      serverIcon.className = `w-10 h-10 text-blue-700 ${activeStep === 2 ? 'animate-bounce' : ''}`;
-      databaseIcon.className = `w-10 h-10 text-blue-700 ${activeStep === 2 ? 'animate-bounce' : ''}`;
+      if (activeStep === 0 || activeStep === 4) panelDevices.classList.add('active');
+      if (activeStep === 1) panelInternet.classList.add('active');
+      if (activeStep === 2) {
+        panelCloud.classList.add('active');
+        cloudInner.classList.add('bouncing');
+      }
 
-      // Update file animations
-      document.getElementById('fileToCloud').classList.toggle('hidden', activeStep !== 3);
-      document.getElementById('fileFromCloud').classList.toggle('hidden', activeStep !== 4);
+      // Update encrypted tunnel visibility and blur internet panel
+      const showTunnel = activeStep === 3 || activeStep === 4;
+      encryptedTunnel.classList.toggle('visible', showTunnel);
+      panelInternet.classList.toggle('blurred', showTunnel);
+
+      // Update file transfer animation
+      fileTransfer.innerHTML = '';
+      if (animationInterval) {
+        clearInterval(animationInterval);
+        animationInterval = null;
+      }
+
+      if (activeStep === 3) {
+        createFileAnimation('to-cloud');
+      } else if (activeStep === 4) {
+        createFileAnimation('from-cloud');
+      }
     }
 
-    document.getElementById('prevBtn').addEventListener('click', () => {
+    prevBtn.addEventListener('click', () => {
       if (activeStep > 0) {
         activeStep--;
         updateUI();
       }
     });
 
-    document.getElementById('nextBtn').addEventListener('click', () => {
-      if (activeStep < 4) {
+    nextBtn.addEventListener('click', () => {
+      if (activeStep < steps.length - 1) {
         activeStep++;
         updateUI();
       }
     });
 
-    document.getElementById('resetBtn').addEventListener('click', () => {
+    resetBtn.addEventListener('click', () => {
       activeStep = 0;
       updateUI();
     });

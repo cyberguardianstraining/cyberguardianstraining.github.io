@@ -4,6 +4,94 @@ title: Tips
 active_page: learn
 ---
 
+<style>
+    .tips-container {
+        display: flex;
+        gap: 30px;
+        align-items: flex-start;
+    }
+
+    .tips-sidebar {
+        width: 250px;
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 20px;
+    }
+
+    .tips-sidebar h3 {
+        margin: 0 0 15px 0;
+        font-size: 18px;
+        color: #333;
+        border-bottom: 2px solid #4A90E2;
+        padding-bottom: 10px;
+    }
+
+    .tips-sidebar nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .tips-sidebar nav > ul > li {
+        margin-bottom: 15px;
+    }
+
+    .tips-sidebar nav > ul > li > a {
+        font-weight: 600;
+        font-size: 16px;
+        color: #4A90E2;
+        text-decoration: none;
+        display: block;
+        padding: 8px 0;
+    }
+
+    .tips-sidebar nav > ul > li > a:hover {
+        color: #357ABD;
+    }
+
+    .tips-sidebar nav ul ul {
+        margin-top: 8px;
+        margin-left: 15px;
+    }
+
+    .tips-sidebar nav ul ul li {
+        margin-bottom: 8px;
+    }
+
+    .tips-sidebar nav ul ul li a {
+        font-size: 14px;
+        color: #666;
+        text-decoration: none;
+        display: block;
+        padding: 4px 0;
+    }
+
+    .tips-sidebar nav ul ul li a:hover {
+        color: #4A90E2;
+    }
+
+    .tips-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Mobile: Move sidebar to top */
+    @media (max-width: 768px) {
+        .tips-container {
+            flex-direction: column;
+        }
+
+        .tips-sidebar {
+            width: 100%;
+            position: static;
+            margin-bottom: 20px;
+        }
+    }
+</style>
+
 <!-- Page-specific header -->
     <div class="page-header">
         <h1>Tips</h1>
@@ -11,14 +99,45 @@ active_page: learn
     </div>
 
     <main>
+        <div class="tips-container">
+            <!-- Sidebar Navigation -->
+            <aside class="tips-sidebar">
+                <h3>Jump to Section</h3>
+                <nav>
+                    <ul>
+                        <li>
+                            <a href="#red-flags">Red Flags</a>
+                            <ul>
+                                <li><a href="#fake-news-red-flags">Fake news red flags</a></li>
+                                <li><a href="#scam-red-flags">Scam red flags</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#public-wifi">Public WiFi</a>
+                        </li>
+                        <!-- Add more sections here as you create them -->
+                        <!--
+                        <li>
+                            <a href="#passwords">Passwords</a>
+                            <ul>
+                                <li><a href="#creating-passwords">Creating strong passwords</a></li>
+                                <li><a href="#password-managers">Using password managers</a></li>
+                            </ul>
+                        </li>
+                        -->
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="tips-content">
         <!-- Example structure for learning content sections -->
-        <div class="content-section">
+        <div class="content-section" id="red-flags">
             <h2>Red Flags to be aware of</h2>
             <p>Below you will find red flags for both fake news and scams. You can use these to check against
                 fake news/potential scam emails you receive, to help determine their credibility.
             </p>
-
-            <h3>🚨Fake news red flags🚨</h3>
+            <h3 id="fake-news-red-flags">🚨Fake news red flags🚨</h3>
             <p>Warnings signs:</p>
 
             <ul class="learning-list">
@@ -31,7 +150,7 @@ active_page: learn
                             <li>🚩 "Share before it's taken down!" urgency</li>
             </ul>
 
-            <h3>🚨Scam red flags🚨</h3>
+            <h3 id="scam-red-flags">🚨Scam red flags🚨</h3>
             <p>Trust your instincts</p>
 
             <ul class="learning-list">
@@ -44,9 +163,35 @@ active_page: learn
                             <li>🚨 Unusual payment methods (gift cards, cryptocurrency)</li>
             </ul>
         </div>
+
+        <div class="content-section" id="public-wifi">
+            <h2>Public WiFi</h2>
+            <p>Public WiFi networks can be dangerous. Here's how to stay safe:</p>
+
+            <ul class="learning-list">
+                <li><strong>Only connect to WiFi networks you know and trust</strong><br>
+                    <em>Ask the staff: "What's your official WiFi name and password?"</em></li>
+
+                <li><strong>Be suspicious of networks without passwords</strong><br>
+                    <em>Most businesses protect their WiFi with a password</em></li>
+
+                <li><strong>Avoid networks with names like 'FREE WiFi' or 'Public WiFi'</strong><br>
+                    <em>These generic names are often used by criminals</em></li>
+
+                <li><strong>Don't do banking or shopping on public WiFi</strong><br>
+                    <em>Wait until you're home or use your phone's data instead</em></li>
+
+                <li><strong>Use your phone's cellular data when possible</strong><br>
+                    <em>Your phone's 4G/5G data is much safer than public WiFi</em></li>
+
+                <li><strong>Look for the lock icon - secure networks require passwords</strong><br>
+                    <em>Password-protected networks are safer than open ones</em></li>
+            </ul>
+        </div>
         <!---
-        <div class="content-section">
-            <h2>[Another Topic - PLACEHOLDER]</h2>
+        <div class="content-section" id="passwords">
+            <h2>Passwords</h2>
+            <h3 id="creating-passwords">Creating strong passwords</h3>
             <p>[Content goes here - PLACEHOLDER]</p>
 
             <ol class="learning-list">
@@ -57,4 +202,6 @@ active_page: learn
         </div>
         --->
         <!-- Add more content-section divs as needed -->
+            </div><!-- End tips-content -->
+        </div><!-- End tips-container -->
     </main>

@@ -1,486 +1,181 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>How Password Managers Work</title>
+---
+layout: default
+title: Password Managers and The Cloud
+---
+
+
   <style>
-    /* === RESET & BASE === */
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-    
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      margin: 0;
-      padding: 20px;
       background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
-      min-height: 100vh;
-      color: #333;
-      line-height: 1.6;
+      min-height: 100vh; color: #333; line-height: 1.6;
     }
-    
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-    }
+    .container { max-width: 900px; margin: 0 auto; padding: 20px; }
 
-    /* === HEADER === */
-    .header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    
+    .header { text-align: center; margin-bottom: 30px; }
     .header-icon {
-      width: 72px;
-      height: 72px;
+      width: 72px; height: 72px;
       background: linear-gradient(135deg, #4A90E2, #357ABD);
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      box-shadow: 0 8px 24px rgba(74, 144, 226, 0.3);
+      border-radius: 20px; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; box-shadow: 0 8px 24px rgba(74, 144, 226, 0.3);
     }
-    
-    .header-icon svg {
-      width: 36px;
-      height: 36px;
-      fill: none;
-      stroke: white;
-      stroke-width: 2;
-    }
-    
-    .header h1 {
-      font-size: 28px;
-      margin: 0 0 10px;
-      color: #1a1a2e;
-    }
-    
-    .header p {
-      font-size: 18px;
-      color: #666;
-      margin: 0;
-    }
+    .header-icon svg { width: 36px; height: 36px; fill: none; stroke: white; stroke-width: 2; }
+    .header h1 { font-size: 28px; margin: 0 0 10px; color: #1a1a2e; }
+    .header p { font-size: 18px; color: #666; margin: 0; }
 
-    /* === TAB NAVIGATION === */
-    .tab-nav {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    
+    .tab-nav { display: flex; gap: 10px; margin-bottom: 20px; }
     .tab-btn {
-      flex: 1;
-      padding: 16px 12px;
-      border: none;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      background: white;
-      color: #666;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      flex: 1; padding: 16px 12px; border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;
+      background: white; color: #666; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
-    
     .tab-btn.active {
       background: linear-gradient(135deg, #4A90E2, #357ABD);
-      color: white;
-      box-shadow: 0 4px 16px rgba(74, 144, 226, 0.4);
+      color: white; box-shadow: 0 4px 16px rgba(74, 144, 226, 0.4);
     }
 
-    /* === PLAY/PAUSE BUTTON === */
-    .controls {
-      text-align: center;
-      margin-bottom: 20px;
+    /* Navigation Controls */
+    .controls { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .nav-btn {
+      padding: 14px 28px; font-size: 16px; font-weight: 600; border: none;
+      border-radius: 12px; cursor: pointer; transition: all 0.3s ease;
+      display: flex; align-items: center; gap: 8px; min-height: 50px;
     }
-    
-    .play-btn {
-      padding: 12px 30px;
-      font-size: 16px;
-      font-weight: 600;
-      border: none;
-      border-radius: 25px;
-      cursor: pointer;
+    .nav-btn:disabled { background: #d1d5db; color: #9ca3af; cursor: not-allowed; }
+    .nav-btn.prev { background: #6b7280; color: white; }
+    .nav-btn.prev:hover:not(:disabled) { background: #4b5563; }
+    .nav-btn.next { background: linear-gradient(135deg, #4A90E2, #357ABD); color: white; }
+    .nav-btn.next:hover:not(:disabled) { background: linear-gradient(135deg, #357ABD, #2563eb); }
+    .nav-btn.reset { background: #f59e0b; color: white; }
+    .nav-btn.reset:hover { background: #d97706; }
+    .nav-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    .step-indicator {
+      display: flex; justify-content: center; gap: 8px; margin-bottom: 16px;
+    }
+    .step-dot {
+      width: 12px; height: 12px; border-radius: 50%; background: #d1d5db;
       transition: all 0.3s ease;
-      min-height: 50px;
     }
-    
-    .play-btn.playing {
-      background: linear-gradient(135deg, #FF9800, #F57C00);
-      color: white;
-    }
-    
-    .play-btn.paused {
-      background: linear-gradient(135deg, #4CAF50, #43A047);
-      color: white;
-    }
+    .step-dot.active { background: #4A90E2; transform: scale(1.2); }
+    .step-dot.completed { background: #4CAF50; }
 
-    /* === TAB CONTENT === */
-    .tab-content {
-      display: none;
-    }
-    
-    .tab-content.active {
-      display: block;
-      animation: fadeIn 0.4s ease;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* === ANIMATION STAGE === */
-    .stage {
-      background: #1a1a2e;
-      border-radius: 16px;
-      padding: 30px;
-      min-height: 350px;
-      position: relative;
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-    
-    .stage-status {
-      position: absolute;
-      top: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: white;
-      padding: 10px 24px;
-      border-radius: 25px;
-      font-size: 15px;
-      font-weight: 600;
-      color: #4A90E2;
-      white-space: nowrap;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    }
-
-    /* === DEVICE BOXES === */
-    .device {
-      position: absolute;
-      padding: 16px 20px;
-      border-radius: 12px;
-      text-align: center;
-      transition: all 0.5s ease;
-      min-width: 100px;
-    }
-    
-    .device svg {
-      width: 36px;
-      height: 36px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 1.5;
-      display: block;
-      margin: 0 auto 8px;
-    }
-    
-    .device-label {
-      font-size: 14px;
-      font-weight: 600;
-    }
-    
-    .device.inactive {
-      background: white;
-      color: #666;
-      border: 2px solid #ddd;
-    }
-    
-    .device.active {
-      color: white;
-      border: 2px solid transparent;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    }
-    
-    .device.phone.active { background: linear-gradient(135deg, #4CAF50, #43A047); }
-    .device.desktop.active { background: linear-gradient(135deg, #2196F3, #1976D2); }
-    .device.browser.active { background: linear-gradient(135deg, #FF9800, #F57C00); }
-    .device.tablet.active { background: linear-gradient(135deg, #9C27B0, #7B1FA2); }
-    
-    .device.cloud {
-      background: linear-gradient(135deg, #4A90E2, #357ABD);
-      color: white;
-      border: 3px solid #64B5F6;
-    }
-    
-    .device.cloud.highlight {
-      box-shadow: 0 0 30px rgba(74, 144, 226, 0.6);
-    }
-
-    /* === ANIMATED ARROWS === */
-    .arrow {
-      position: absolute;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    
-    .arrow.visible {
-      opacity: 1;
-    }
-    
-    .arrow-line {
-      stroke: #4CAF50;
-      stroke-width: 3;
-      stroke-dasharray: 8, 4;
-      fill: none;
-    }
-    
-    .arrow-line.sync {
-      animation: dashMove 1s linear infinite;
-    }
-    
-    @keyframes dashMove {
-      from { stroke-dashoffset: 12; }
-      to { stroke-dashoffset: 0; }
-    }
-
-    /* === EXPLANATION CARD === */
     .explanation {
-      background: white;
-      border-radius: 16px;
-      padding: 25px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      background: white; border-radius: 16px; padding: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 20px;
     }
-    
-    .explanation h3 {
-      color: #4A90E2;
-      font-size: 22px;
-      margin: 0 0 16px;
-    }
-    
-    .explanation p {
-      font-size: 17px;
-      color: #555;
-      margin-bottom: 20px;
-    }
+    .explanation h3 { color: #4A90E2; font-size: 22px; margin: 0 0 16px; }
+    .explanation p { font-size: 17px; color: #555; margin-bottom: 20px; }
     
     .point {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      padding: 14px 16px;
-      border-radius: 10px;
-      margin-bottom: 12px;
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 14px 16px; border-radius: 10px; margin-bottom: 12px;
     }
-    
     .point.green { background: #E8F5E9; }
     .point.blue { background: #E3F2FD; }
     .point.orange { background: #FFF3E0; }
     .point.purple { background: #F3E5F5; }
-    
     .point-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
-    
     .point.green .point-icon { background: #4CAF50; }
     .point.blue .point-icon { background: #2196F3; }
     .point.orange .point-icon { background: #FF9800; }
     .point.purple .point-icon { background: #9C27B0; }
+    .point-icon svg { width: 16px; height: 16px; stroke: white; fill: none; stroke-width: 3; }
+    .point span { font-size: 16px; color: #555; }
     
-    .point-icon svg {
-      width: 16px;
-      height: 16px;
-      stroke: white;
-      fill: none;
-      stroke-width: 3;
+    .key-point { margin-top: 20px; padding: 18px; background: #f8fafc; border-radius: 10px; font-size: 16px; }
+    .key-point strong { color: #4A90E2; }
+
+    .stage {
+      background: #1a1a2e; border-radius: 16px; padding: 30px;
+      min-height: 350px; position: relative; overflow: hidden;
     }
-    
-    .point span {
-      font-size: 16px;
-      color: #555;
-    }
-    
-    .key-point {
-      margin-top: 20px;
-      padding: 18px;
-      background: #f8fafc;
-      border-radius: 10px;
-      font-size: 16px;
-    }
-    
-    .key-point strong {
-      color: #4A90E2;
+    .stage-status {
+      position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+      background: white; padding: 10px 24px; border-radius: 25px;
+      font-size: 15px; font-weight: 600; color: #4A90E2;
+      white-space: nowrap; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
 
-    /* === BROWSER MOCKUP (Tab 3) === */
+    .device {
+      position: absolute; padding: 16px 20px; border-radius: 12px;
+      text-align: center; transition: all 0.5s ease; min-width: 100px;
+    }
+    .device svg {
+      width: 36px; height: 36px; stroke: currentColor; fill: none;
+      stroke-width: 1.5; display: block; margin: 0 auto 8px;
+    }
+    .device-label { font-size: 14px; font-weight: 600; }
+    .device.inactive { background: white; color: #666; border: 2px solid #ddd; }
+    .device.active { color: white; border: 2px solid transparent; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+    .device.phone.active { background: linear-gradient(135deg, #4CAF50, #43A047); }
+    .device.desktop.active { background: linear-gradient(135deg, #2196F3, #1976D2); }
+    .device.browser.active { background: linear-gradient(135deg, #FF9800, #F57C00); }
+    .device.tablet.active { background: linear-gradient(135deg, #9C27B0, #7B1FA2); }
+    .device.cloud { background: linear-gradient(135deg, #4A90E2, #357ABD); color: white; border: 3px solid #64B5F6; }
+    .device.cloud.highlight { box-shadow: 0 0 30px rgba(74, 144, 226, 0.6); }
+
+    .arrow { position: absolute; opacity: 0; transition: opacity 0.3s ease; }
+    .arrow.visible { opacity: 1; }
+    .arrow-line { stroke: #4CAF50; stroke-width: 3; stroke-dasharray: 8, 4; fill: none; }
+    .arrow-line.sync { animation: dashMove 1s linear infinite; }
+    @keyframes dashMove { from { stroke-dashoffset: 12; } to { stroke-dashoffset: 0; } }
+
     .browser-mockup {
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-      max-width: 500px;
-      margin: 60px auto 0;
+      background: white; border-radius: 12px; overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-width: 500px; margin: 60px auto 0;
     }
-    
     .browser-bar {
-      background: #e0e0e0;
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      background: #e0e0e0; padding: 10px 12px;
+      display: flex; align-items: center; gap: 10px;
     }
-    
-    .browser-dots {
-      display: flex;
-      gap: 6px;
-    }
-    
-    .browser-dots span {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
-    
+    .browser-dots { display: flex; gap: 6px; }
+    .browser-dots span { width: 12px; height: 12px; border-radius: 50%; }
     .browser-dots span:nth-child(1) { background: #FF5F56; }
     .browser-dots span:nth-child(2) { background: #FFBD2E; }
     .browser-dots span:nth-child(3) { background: #27C93F; }
-    
-    .browser-url {
-      flex: 1;
-      background: white;
-      padding: 6px 14px;
-      border-radius: 15px;
-      font-size: 13px;
-      color: #333;
-    }
-    
-    .browser-extension {
-      width: 28px;
-      height: 28px;
-      transition: all 0.3s ease;
-    }
-    
-    .browser-extension svg {
-      width: 100%;
-      height: 100%;
-      stroke: #999;
-      fill: none;
-      stroke-width: 1.5;
-    }
-    
-    .browser-extension.active svg {
-      stroke: #FF9800;
-    }
-    
-    .browser-body {
-      padding: 30px;
-    }
-    
-    .browser-body h2 {
-      text-align: center;
-      margin: 0 0 25px;
-      color: #333;
-      font-size: 20px;
-    }
-    
-    .form-field {
-      margin-bottom: 16px;
-    }
-    
-    .form-field label {
-      display: block;
-      font-size: 13px;
-      color: #666;
-      margin-bottom: 6px;
-    }
-    
+    .browser-url { flex: 1; background: white; padding: 6px 14px; border-radius: 15px; font-size: 13px; color: #333; }
+    .browser-extension { width: 28px; height: 28px; transition: all 0.3s ease; }
+    .browser-extension svg { width: 100%; height: 100%; stroke: #999; fill: none; stroke-width: 1.5; }
+    .browser-extension.active svg { stroke: #FF9800; }
+    .browser-body { padding: 30px; }
+    .browser-body h2 { text-align: center; margin: 0 0 25px; color: #333; font-size: 20px; }
+    .form-field { margin-bottom: 16px; }
+    .form-field label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
     .form-field input {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #ddd;
-      border-radius: 6px;
-      font-size: 15px;
-      transition: all 0.5s ease;
+      width: 100%; padding: 12px; border: 2px solid #ddd;
+      border-radius: 6px; font-size: 15px; transition: all 0.5s ease;
     }
-    
-    .form-field input.filled {
-      background: #E8F5E9;
-      border-color: #81C784;
-    }
-    
+    .form-field input.filled { background: #E8F5E9; border-color: #81C784; }
     .login-btn {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.5s ease;
-      background: #4A90E2;
-      color: white;
+      width: 100%; padding: 14px; border: none; border-radius: 6px;
+      font-size: 16px; font-weight: 600; cursor: pointer;
+      transition: all 0.5s ease; background: #4A90E2; color: white;
     }
-    
-    .login-btn.success {
-      background: #4CAF50;
-    }
-    
-    /* Extension popup */
+    .login-btn.success { background: #4CAF50; }
     .extension-popup {
-      position: absolute;
-      top: 120px;
-      right: 30px;
-      background: white;
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-      width: 200px;
-      opacity: 0;
-      transform: translateY(-10px);
-      transition: all 0.4s ease;
-      pointer-events: none;
+      position: absolute; top: 120px; right: 30px; background: white;
+      padding: 16px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      width: 200px; opacity: 0; transform: translateY(-10px);
+      transition: all 0.4s ease; pointer-events: none;
     }
-    
-    .extension-popup.visible {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-    
-    .extension-popup h4 {
-      margin: 0 0 10px;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .extension-popup h4 svg {
-      width: 20px;
-      height: 20px;
-      stroke: #FF9800;
-      fill: none;
-    }
-    
-    .extension-popup p {
-      font-size: 13px;
-      color: #666;
-      margin: 0 0 12px;
-    }
-    
+    .extension-popup.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .extension-popup h4 { margin: 0 0 10px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+    .extension-popup h4 svg { width: 20px; height: 20px; stroke: #FF9800; fill: none; }
+    .extension-popup p { font-size: 13px; color: #666; margin: 0 0 12px; }
     .extension-popup button {
-      width: 100%;
-      padding: 10px;
-      background: #FF9800;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
+      width: 100%; padding: 10px; background: #FF9800; color: white;
+      border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;
     }
 
-    /* === RESPONSIVE === */
     @media (max-width: 600px) {
       body { padding: 16px; }
       .header h1 { font-size: 24px; }
@@ -490,12 +185,11 @@
       .device svg { width: 28px; height: 28px; }
       .device-label { font-size: 12px; }
       .browser-mockup { margin: 50px 10px 0; }
+      .nav-btn { padding: 12px 20px; font-size: 14px; }
     }
   </style>
-</head>
-<body>
+
   <div class="container">
-    <!-- Header -->
     <div class="header">
       <div class="header-icon">
         <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -504,48 +198,69 @@
       <p>See how your devices work together to keep passwords safe</p>
     </div>
 
-    <!-- Tab Navigation -->
     <div class="tab-nav">
       <button class="tab-btn active" data-tab="1">📤 Storing</button>
       <button class="tab-btn" data-tab="2">🔄 Syncing</button>
       <button class="tab-btn" data-tab="3">✨ Auto-Fill</button>
     </div>
 
-    <!-- Play/Pause Control -->
-    <div class="controls">
-      <button class="play-btn playing" id="playBtn">⏸ Pause Animation</button>
-    </div>
-
     <!-- Tab 1: Storing Passwords -->
     <div class="tab-content active" id="tab1">
+      <div class="explanation">
+        <h3>How Passwords Are Stored</h3>
+        <p>No matter which device you use, all passwords go to the <strong>same</strong> secure cloud storage - one place for everything:</p>
+        <div class="point green">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <span>Save a password on your <strong>phone</strong> → It goes to the cloud</span>
+        </div>
+        <div class="point blue">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <span>Save a password on your <strong>computer</strong> → Same cloud</span>
+        </div>
+        <div class="point orange">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <span>Save a password in your <strong>browser</strong> → Same cloud</span>
+        </div>
+        <div class="key-point">
+          <strong>💡 Key Point:</strong> All passwords are encrypted and stored in ONE secure location. This is why they appear on all your devices automatically.
+        </div>
+      </div>
+
+      <div class="step-indicator" id="stepIndicator1"></div>
+      <div class="controls">
+        <button class="nav-btn prev" id="prevBtn1" disabled>
+          <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          Previous
+        </button>
+        <button class="nav-btn next" id="nextBtn1">
+          Next
+          <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <button class="nav-btn reset" id="resetBtn1">
+          <svg viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+          Restart
+        </button>
+      </div>
+
       <div class="stage" id="stage1">
-        <div class="stage-status" id="status1">All devices connect to cloud storage</div>
-        
-        <!-- Cloud (center) -->
+        <div class="stage-status" id="status1">All devices connect to the same cloud</div>
         <div class="device cloud" id="cloud1" style="left: 50%; top: 40%; transform: translate(-50%, -50%);">
           <svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
           <div class="device-label">Secure Cloud</div>
+          <div style="font-size:11px;margin-top:4px;opacity:0.8;">🔒 One Location</div>
         </div>
-        
-        <!-- Phone (top left) -->
         <div class="device phone inactive" id="phone1" style="left: 10%; top: 10%;">
           <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
           <div class="device-label">Phone</div>
         </div>
-        
-        <!-- Desktop (top right) -->
         <div class="device desktop inactive" id="desktop1" style="right: 10%; top: 15%;">
           <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
           <div class="device-label">Computer</div>
         </div>
-        
-        <!-- Browser (bottom) -->
         <div class="device browser inactive" id="browser1" style="left: 50%; bottom: 5%; transform: translateX(-50%);">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           <div class="device-label">Browser</div>
         </div>
-        
-        <!-- SVG for arrows -->
         <svg class="arrow" id="arrow1-phone" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
           <line class="arrow-line sync" x1="18%" y1="28%" x2="42%" y2="45%"/>
         </svg>
@@ -556,63 +271,65 @@
           <line class="arrow-line sync" x1="50%" y1="78%" x2="50%" y2="55%"/>
         </svg>
       </div>
-
-      <div class="explanation">
-        <h3>How Passwords Are Stored</h3>
-        <p>No matter which device you use, all passwords go to the same secure cloud storage:</p>
-        
-        <div class="point green">
-          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-          <span>Save a password on your <strong>phone</strong> → It goes to the cloud</span>
-        </div>
-        
-        <div class="point blue">
-          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-          <span>Save a password on your <strong>computer</strong> → Same cloud</span>
-        </div>
-        
-        <div class="point orange">
-          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-          <span>Save a password in your <strong>browser</strong> → Same cloud</span>
-        </div>
-        
-        <div class="key-point">
-          <strong>💡 Key Point:</strong> All passwords are encrypted before being stored. They all go to one secure location that syncs across all your devices.
-        </div>
-      </div>
     </div>
 
     <!-- Tab 2: Syncing Devices -->
     <div class="tab-content" id="tab2">
+      <div class="explanation">
+        <h3>How Syncing Works</h3>
+        <p>Because everything is in <strong>one cloud location</strong>, all your devices automatically get updates:</p>
+        <div class="point green">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <span>Save on your <strong>phone</strong> → Appears on computer and tablet in seconds</span>
+        </div>
+        <div class="point blue">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <span>Change on your <strong>computer</strong> → All devices get the update</span>
+        </div>
+        <div class="point purple">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <span>Delete on your <strong>tablet</strong> → Removed from all devices</span>
+        </div>
+        <div class="key-point">
+          <strong>💡 Key Point:</strong> Your devices regularly check the same cloud storage. Any change appears everywhere within seconds.
+        </div>
+      </div>
+
+      <div class="step-indicator" id="stepIndicator2"></div>
+      <div class="controls">
+        <button class="nav-btn prev" id="prevBtn2" disabled>
+          <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          Previous
+        </button>
+        <button class="nav-btn next" id="nextBtn2">
+          Next
+          <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <button class="nav-btn reset" id="resetBtn2">
+          <svg viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+          Restart
+        </button>
+      </div>
+
       <div class="stage" id="stage2">
-        <div class="stage-status" id="status2">Password saved in cloud...</div>
-        
-        <!-- Cloud (top center) -->
+        <div class="stage-status" id="status2">Password saved in the cloud...</div>
         <div class="device cloud" style="left: 50%; top: 20%; transform: translateX(-50%);">
           <svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
           <div class="device-label">Cloud Storage</div>
-          <div style="font-size:11px;margin-top:4px;opacity:0.8;">🔒 Encrypted</div>
+          <div style="font-size:11px;margin-top:4px;opacity:0.8;">🔒 One Location</div>
         </div>
-        
-        <!-- Phone (bottom left) -->
         <div class="device phone inactive" id="phone2" style="left: 12%; bottom: 18%;">
           <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
           <div class="device-label">Phone</div>
         </div>
-        
-        <!-- Desktop (bottom right) -->
         <div class="device desktop inactive" id="desktop2" style="right: 12%; bottom: 18%;">
           <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
           <div class="device-label">Computer</div>
         </div>
-        
-        <!-- Tablet (bottom center) -->
         <div class="device tablet inactive" id="tablet2" style="left: 50%; bottom: 10%; transform: translateX(-50%);">
           <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
           <div class="device-label">Tablet</div>
         </div>
-        
-        <!-- Arrows -->
         <svg class="arrow" id="arrow2-phone" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
           <line class="arrow-line sync" x1="42%" y1="38%" x2="22%" y2="62%"/>
         </svg>
@@ -623,42 +340,55 @@
           <line class="arrow-line sync" x1="50%" y1="41%" x2="50%" y2="62%"/>
         </svg>
       </div>
-
-      <div class="explanation">
-        <h3>How Syncing Works</h3>
-        <p>Once a password is in the cloud, all your devices automatically download it:</p>
-        
-        <div class="point green">
-          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-          <span>Save on your <strong>phone</strong> → Appears on computer and tablet in seconds</span>
-        </div>
-        
-        <div class="point blue">
-          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-          <span>Change on your <strong>computer</strong> → All devices get the update</span>
-        </div>
-        
-        <div class="point purple">
-          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-          <span>Delete on your <strong>tablet</strong> → Removed from all devices</span>
-        </div>
-        
-        <div class="key-point">
-          <strong>💡 Key Point:</strong> Your devices check the cloud regularly. Any change is automatically reflected everywhere within seconds.
-        </div>
-      </div>
     </div>
 
     <!-- Tab 3: Auto-Fill -->
     <div class="tab-content" id="tab3">
+      <div class="explanation">
+        <h3>How Auto-Fill Works</h3>
+        <p>The browser extension recognizes login pages and fills your credentials automatically:</p>
+        <div class="point orange">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <span><strong>Step 1:</strong> You visit a website (like your bank or email)</span>
+        </div>
+        <div class="point orange">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <span><strong>Step 2:</strong> Extension detects the login page and checks for saved credentials</span>
+        </div>
+        <div class="point orange">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <span><strong>Step 3:</strong> It automatically fills your username and password</span>
+        </div>
+        <div class="point green">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <span><strong>Done!</strong> Click login - no typing required</span>
+        </div>
+        <div class="key-point">
+          <strong>💡 Key Point:</strong> The extension works in the background. You'll never have to remember or type passwords again!
+        </div>
+      </div>
+
+      <div class="step-indicator" id="stepIndicator3"></div>
+      <div class="controls">
+        <button class="nav-btn prev" id="prevBtn3" disabled>
+          <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          Previous
+        </button>
+        <button class="nav-btn next" id="nextBtn3">
+          Next
+          <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <button class="nav-btn reset" id="resetBtn3">
+          <svg viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+          Restart
+        </button>
+      </div>
+
       <div class="stage" id="stage3">
         <div class="stage-status" id="status3">🌐 You visit a website...</div>
-        
         <div class="browser-mockup">
           <div class="browser-bar">
-            <div class="browser-dots">
-              <span></span><span></span><span></span>
-            </div>
+            <div class="browser-dots"><span></span><span></span><span></span></div>
             <div class="browser-url">🔒 www.yourbank.com</div>
             <div class="browser-extension" id="extensionIcon">
               <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
@@ -677,7 +407,6 @@
             <button class="login-btn" id="autoLoginBtn">Login</button>
           </div>
         </div>
-        
         <div class="extension-popup" id="extensionPopup">
           <h4>
             <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
@@ -687,49 +416,16 @@
           <button>Auto-Fill</button>
         </div>
       </div>
-
-      <div class="explanation">
-        <h3>How Auto-Fill Works</h3>
-        <p>The browser extension recognizes login pages and fills your credentials automatically:</p>
-        
-        <div class="point orange">
-          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-          <span><strong>Step 1:</strong> You visit a website (like your bank or email)</span>
-        </div>
-        
-        <div class="point orange">
-          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-          <span><strong>Step 2:</strong> Extension detects the login page and checks for saved credentials</span>
-        </div>
-        
-        <div class="point orange">
-          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-          <span><strong>Step 3:</strong> It automatically fills your username and password</span>
-        </div>
-        
-        <div class="point green">
-          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-          <span><strong>Done!</strong> Click login - no typing required</span>
-        </div>
-        
-        <div class="key-point">
-          <strong>💡 Key Point:</strong> The extension works in the background. You'll never have to remember or type passwords again!
-        </div>
-      </div>
     </div>
   </div>
 
   <script>
-    // === STATE ===
     let currentTab = 1;
-    let isPlaying = true;
-    let animationPhase = 0;
-    let animationInterval = null;
+    const maxSteps = [5, 4, 3]; // Max steps for each tab
+    let currentStep = [0, 0, 0]; // Current step for each tab
 
-    // === DOM ELEMENTS ===
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
-    const playBtn = document.getElementById('playBtn');
 
     // Tab 1 elements
     const status1 = document.getElementById('status1');
@@ -758,217 +454,130 @@
     const autoPassword = document.getElementById('autoPassword');
     const autoLoginBtn = document.getElementById('autoLoginBtn');
 
-    // === TAB SWITCHING ===
+    // Initialize step indicators
+    function initStepIndicators() {
+      for (let t = 1; t <= 3; t++) {
+        const container = document.getElementById('stepIndicator' + t);
+        container.innerHTML = '';
+        for (let i = 0; i <= maxSteps[t-1]; i++) {
+          const dot = document.createElement('div');
+          dot.className = 'step-dot' + (i === 0 ? ' active' : '');
+          container.appendChild(dot);
+        }
+      }
+    }
+
+    function updateStepIndicator(tab) {
+      const container = document.getElementById('stepIndicator' + tab);
+      const dots = container.querySelectorAll('.step-dot');
+      dots.forEach((dot, i) => {
+        dot.classList.remove('active', 'completed');
+        if (i < currentStep[tab-1]) dot.classList.add('completed');
+        else if (i === currentStep[tab-1]) dot.classList.add('active');
+      });
+    }
+
+    function updateButtons(tab) {
+      const prevBtn = document.getElementById('prevBtn' + tab);
+      const nextBtn = document.getElementById('nextBtn' + tab);
+      prevBtn.disabled = currentStep[tab-1] === 0;
+      nextBtn.disabled = currentStep[tab-1] >= maxSteps[tab-1];
+    }
+
     function switchTab(tab) {
       currentTab = tab;
-      animationPhase = 0;
-      
-      // Update tab buttons
-      tabBtns.forEach(btn => {
-        btn.classList.toggle('active', parseInt(btn.dataset.tab) === tab);
-      });
-      
-      // Update tab content
-      tabContents.forEach(content => content.classList.remove('active'));
+      tabBtns.forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.tab) === tab));
+      tabContents.forEach(c => c.classList.remove('active'));
       document.getElementById('tab' + tab).classList.add('active');
-      
-      // Reset and restart animation
-      resetAnimation();
-      if (isPlaying) startAnimation();
+      updateAnimation(tab);
+      updateStepIndicator(tab);
+      updateButtons(tab);
     }
 
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => switchTab(parseInt(btn.dataset.tab)));
-    });
+    tabBtns.forEach(btn => btn.addEventListener('click', () => switchTab(parseInt(btn.dataset.tab))));
 
-    // === PLAY/PAUSE ===
-    playBtn.addEventListener('click', () => {
-      isPlaying = !isPlaying;
-      playBtn.textContent = isPlaying ? '⏸ Pause Animation' : '▶ Play Animation';
-      playBtn.classList.toggle('playing', isPlaying);
-      playBtn.classList.toggle('paused', !isPlaying);
-      
-      if (isPlaying) {
-        startAnimation();
-      } else {
-        stopAnimation();
-      }
-    });
-
-    // === ANIMATION CONTROL ===
-    function startAnimation() {
-      stopAnimation(); // Clear any existing interval
-      animationInterval = setInterval(() => {
-        animationPhase++;
-        const maxPhase = currentTab === 1 ? 5 : currentTab === 2 ? 4 : 4;
-        if (animationPhase > maxPhase) animationPhase = 0;
-        updateAnimation();
-      }, 3000); // <- Change speed of animation
+    // Navigation buttons for each tab
+    for (let t = 1; t <= 3; t++) {
+      document.getElementById('prevBtn' + t).addEventListener('click', () => {
+        if (currentStep[t-1] > 0) {
+          currentStep[t-1]--;
+          updateAnimation(t);
+          updateStepIndicator(t);
+          updateButtons(t);
+        }
+      });
+      document.getElementById('nextBtn' + t).addEventListener('click', () => {
+        if (currentStep[t-1] < maxSteps[t-1]) {
+          currentStep[t-1]++;
+          updateAnimation(t);
+          updateStepIndicator(t);
+          updateButtons(t);
+        }
+      });
+      document.getElementById('resetBtn' + t).addEventListener('click', () => {
+        currentStep[t-1] = 0;
+        updateAnimation(t);
+        updateStepIndicator(t);
+        updateButtons(t);
+      });
     }
 
-    function stopAnimation() {
-      if (animationInterval) {
-        clearInterval(animationInterval);
-        animationInterval = null;
-      }
+    function updateAnimation(tab) {
+      if (tab === 1) updateTab1();
+      else if (tab === 2) updateTab2();
+      else if (tab === 3) updateTab3();
     }
 
-    function resetAnimation() {
-      animationPhase = 0;
-      updateAnimation();
-    }
-
-    // === UPDATE ANIMATION BASED ON CURRENT TAB AND PHASE ===
-    function updateAnimation() {
-      if (currentTab === 1) updateTab1Animation();
-      else if (currentTab === 2) updateTab2Animation();
-      else if (currentTab === 3) updateTab3Animation();
-    }
-
-    function updateTab1Animation() {
-      // Reset all
-      phone1.classList.remove('active');
-      phone1.classList.add('inactive');
-      desktop1.classList.remove('active');
-      desktop1.classList.add('inactive');
-      browser1.classList.remove('active');
-      browser1.classList.add('inactive');
+    function updateTab1() {
+      const p = currentStep[0];
+      phone1.classList.remove('active'); phone1.classList.add('inactive');
+      desktop1.classList.remove('active'); desktop1.classList.add('inactive');
+      browser1.classList.remove('active'); browser1.classList.add('inactive');
       cloud1.classList.remove('highlight');
       arrow1Phone.classList.remove('visible');
       arrow1Desktop.classList.remove('visible');
       arrow1Browser.classList.remove('visible');
 
-      switch(animationPhase) {
-        case 0:
-          status1.textContent = 'All devices connect to cloud storage';
-          break;
-        case 1:
-          status1.textContent = '📱 Saving from phone...';
-          phone1.classList.remove('inactive');
-          phone1.classList.add('active');
-          arrow1Phone.classList.add('visible');
-          break;
-        case 2:
-          status1.textContent = '☁️ Stored encrypted in cloud';
-          cloud1.classList.add('highlight');
-          break;
-        case 3:
-          status1.textContent = '💻 Saving from computer...';
-          desktop1.classList.remove('inactive');
-          desktop1.classList.add('active');
-          arrow1Desktop.classList.add('visible');
-          break;
-        case 4:
-          status1.textContent = '🌐 Saving from browser...';
-          browser1.classList.remove('inactive');
-          browser1.classList.add('active');
-          arrow1Browser.classList.add('visible');
-          break;
-        case 5:
-          status1.textContent = '✓ All devices store in same cloud';
-          cloud1.classList.add('highlight');
-          break;
-      }
+      if (p === 0) { status1.textContent = 'All devices connect to the same cloud'; }
+      else if (p === 1) { status1.textContent = '📱 Saving from phone...'; phone1.classList.remove('inactive'); phone1.classList.add('active'); arrow1Phone.classList.add('visible'); }
+      else if (p === 2) { status1.textContent = '☁️ Stored encrypted in cloud'; cloud1.classList.add('highlight'); }
+      else if (p === 3) { status1.textContent = '💻 Saving from computer...'; desktop1.classList.remove('inactive'); desktop1.classList.add('active'); arrow1Desktop.classList.add('visible'); }
+      else if (p === 4) { status1.textContent = '🌐 Saving from browser...'; browser1.classList.remove('inactive'); browser1.classList.add('active'); arrow1Browser.classList.add('visible'); }
+      else { status1.textContent = '✅ All devices store in the SAME cloud!'; cloud1.classList.add('highlight'); }
     }
 
-    function updateTab2Animation() {
-      // Reset all
-      phone2.classList.remove('active');
-      phone2.classList.add('inactive');
-      desktop2.classList.remove('active');
-      desktop2.classList.add('inactive');
-      tablet2.classList.remove('active');
-      tablet2.classList.add('inactive');
+    function updateTab2() {
+      const p = currentStep[1];
+      phone2.classList.remove('active'); phone2.classList.add('inactive');
+      desktop2.classList.remove('active'); desktop2.classList.add('inactive');
+      tablet2.classList.remove('active'); tablet2.classList.add('inactive');
       arrow2Phone.classList.remove('visible');
       arrow2Desktop.classList.remove('visible');
       arrow2Tablet.classList.remove('visible');
 
-      switch(animationPhase) {
-        case 0:
-          status2.textContent = 'Password saved in cloud...';
-          break;
-        case 1:
-          status2.textContent = '📱 Syncing to phone...';
-          phone2.classList.remove('inactive');
-          phone2.classList.add('active');
-          arrow2Phone.classList.add('visible');
-          break;
-        case 2:
-          status2.textContent = '💻 Syncing to computer...';
-          phone2.classList.remove('inactive');
-          phone2.classList.add('active');
-          desktop2.classList.remove('inactive');
-          desktop2.classList.add('active');
-          arrow2Phone.classList.add('visible');
-          arrow2Desktop.classList.add('visible');
-          break;
-        case 3:
-          status2.textContent = '📱 Syncing to tablet...';
-          phone2.classList.remove('inactive');
-          phone2.classList.add('active');
-          desktop2.classList.remove('inactive');
-          desktop2.classList.add('active');
-          tablet2.classList.remove('inactive');
-          tablet2.classList.add('active');
-          arrow2Phone.classList.add('visible');
-          arrow2Desktop.classList.add('visible');
-          arrow2Tablet.classList.add('visible');
-          break;
-        case 4:
-          status2.textContent = '✓ All devices have the password!';
-          phone2.classList.remove('inactive');
-          phone2.classList.add('active');
-          desktop2.classList.remove('inactive');
-          desktop2.classList.add('active');
-          tablet2.classList.remove('inactive');
-          tablet2.classList.add('active');
-          break;
-      }
+      if (p === 0) { status2.textContent = 'Password saved in the cloud...'; }
+      else if (p === 1) { status2.textContent = '📱 Syncing to phone...'; phone2.classList.remove('inactive'); phone2.classList.add('active'); arrow2Phone.classList.add('visible'); }
+      else if (p === 2) { status2.textContent = '💻 Syncing to computer...'; phone2.classList.remove('inactive'); phone2.classList.add('active'); desktop2.classList.remove('inactive'); desktop2.classList.add('active'); arrow2Phone.classList.add('visible'); arrow2Desktop.classList.add('visible'); }
+      else if (p === 3) { status2.textContent = '📱 Syncing to tablet...'; phone2.classList.remove('inactive'); phone2.classList.add('active'); desktop2.classList.remove('inactive'); desktop2.classList.add('active'); tablet2.classList.remove('inactive'); tablet2.classList.add('active'); arrow2Phone.classList.add('visible'); arrow2Desktop.classList.add('visible'); arrow2Tablet.classList.add('visible'); }
+      else { status2.textContent = '✅ All devices have the password!'; phone2.classList.remove('inactive'); phone2.classList.add('active'); desktop2.classList.remove('inactive'); desktop2.classList.add('active'); tablet2.classList.remove('inactive'); tablet2.classList.add('active'); }
     }
 
-    function updateTab3Animation() {
-      // Reset all
+    function updateTab3() {
+      const p = currentStep[2];
       extensionIcon.classList.remove('active');
       extensionPopup.classList.remove('visible');
-      autoUsername.value = '';
-      autoPassword.value = '';
-      autoUsername.classList.remove('filled');
-      autoPassword.classList.remove('filled');
-      autoLoginBtn.classList.remove('success');
-      autoLoginBtn.textContent = 'Login';
+      autoUsername.value = ''; autoPassword.value = '';
+      autoUsername.classList.remove('filled'); autoPassword.classList.remove('filled');
+      autoLoginBtn.classList.remove('success'); autoLoginBtn.textContent = 'Login';
 
-      switch(animationPhase) {
-        case 0:
-          status3.textContent = '🌐 You visit a website...';
-          break;
-        case 1:
-          status3.textContent = '🔌 Extension detects login page';
-          extensionIcon.classList.add('active');
-          extensionPopup.classList.add('visible');
-          break;
-        case 2:
-          status3.textContent = '✨ Automatically fills credentials';
-          extensionIcon.classList.add('active');
-          autoUsername.value = 'john.smith@email.com';
-          autoPassword.value = 'SecurePass123!';
-          autoUsername.classList.add('filled');
-          autoPassword.classList.add('filled');
-          break;
-        case 3:
-        case 4:
-          status3.textContent = '✓ Logged in - no typing needed!';
-          autoUsername.value = 'john.smith@email.com';
-          autoPassword.value = 'SecurePass123!';
-          autoUsername.classList.add('filled');
-          autoPassword.classList.add('filled');
-          autoLoginBtn.classList.add('success');
-          autoLoginBtn.textContent = '✓ Logged In!';
-          break;
-      }
+      if (p === 0) { status3.textContent = '🌐 You visit a website...'; }
+      else if (p === 1) { status3.textContent = '🔌 Extension detects login page'; extensionIcon.classList.add('active'); extensionPopup.classList.add('visible'); }
+      else if (p === 2) { status3.textContent = '✨ Automatically fills credentials'; extensionIcon.classList.add('active'); autoUsername.value = 'john.smith@email.com'; autoPassword.value = 'SecurePass123!'; autoUsername.classList.add('filled'); autoPassword.classList.add('filled'); }
+      else { status3.textContent = '✅ Logged in - no typing needed!'; autoUsername.value = 'john.smith@email.com'; autoPassword.value = 'SecurePass123!'; autoUsername.classList.add('filled'); autoPassword.classList.add('filled'); autoLoginBtn.classList.add('success'); autoLoginBtn.textContent = '✓ Logged In!'; }
     }
 
-    // === INITIALIZE ===
-    startAnimation();
+    // Initialize
+    initStepIndicators();
+    updateAnimation(1);
   </script>
-</body>
-</html>
+

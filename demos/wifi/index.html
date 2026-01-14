@@ -1,11 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Understanding Public WiFi Security</title>
+---
+layout: default
+title: "Public WiFi: Avoiding the Risks"
+---
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        body {
+            background: linear-gradient(to bottom right, #eff6ff, #e0e7ff);
+            min-height: 100vh;
+        }
+
         .icon-shield::before { content: '🛡️'; }
         .icon-wifi::before { content: '📶'; }
         .icon-alert::before { content: '⚠️'; }
@@ -13,9 +17,7 @@
         .icon-lock::before { content: '🔒'; }
         .icon-unlock::before { content: '🔓'; }
     </style>
-</head>
-<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-    <div class="max-w-4xl mx-auto">
+    <div class="pt-8 max-w-4xl mx-auto">
         <div class="bg-white rounded-2xl shadow-2xl p-8 mb-6">
             <div class="mb-8">
                 <div class="flex justify-between items-center mb-4">
@@ -52,6 +54,7 @@
             <p>💡 Tip: Take your time on each step to understand the risks</p>
         </div>
     </div>
+    </body>
 
     <script>
         let currentStep = 0;
@@ -449,5 +452,3 @@
         // Initialize
         renderContent();
     </script>
-</body>
-</html>

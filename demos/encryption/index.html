@@ -1,9 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Understanding Encryption - Interactive Guide</title>
+---
+layout: default
+title: Understanding Encryption - Interactive Guide
+---
+
+
     <style>
         * {
             margin: 0;
@@ -20,6 +20,10 @@
         }
         
         .container {
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            line-height: 1.8;
+            background-color: #ffffff;
             max-width: 900px;
             margin: 0 auto;
             padding: 30px;
@@ -333,8 +337,7 @@
             margin-bottom: 15px;
         }
     </style>
-</head>
-<body>
+
     <div class="container">
         <div class="header">
             <svg class="header-icon" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24">
@@ -384,7 +387,7 @@
                     Real Life Example
                 </h3>
                 <p style="margin-bottom: 15px;">
-                    When you see a small padlock icon in your web browser's address bar, it means the website is using encryption. Your information is being scrambled so that nobody else can read it while it travels across the internet.
+                    Most internet traffic today is automatically encrypted. Your information is being scrambled so that nobody else can read it while it travels across the internet. This protection means that eavesdroppers can't snoop on your messages, but remember - it doesn't mean the person or website you're communicating with is trustworthy.
                 </p>
                 <p style="font-weight: bold; color: #1e40af;">
                     This happens automatically - you don't have to do anything special!
@@ -558,12 +561,6 @@
                 </p>
             </div>
 
-            <div class="good-news-box">
-                <h3>The Good News</h3>
-                <p style="font-size: 19px; line-height: 1.8;">
-                    All of this complex encryption happens automatically behind the scenes. You don't need to do anything special - your devices and websites handle it for you. When you see that little padlock icon in your web browser, you know your information is being protected by this powerful encryption!
-                </p>
-            </div>
         </div>
     </div>
 
@@ -662,5 +659,3 @@
             feedbackDiv.classList.remove('hidden');
         }
     </script>
-</body>
-</html>

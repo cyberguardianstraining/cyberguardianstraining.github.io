@@ -1,715 +1,476 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Understanding Man-in-the-Middle Attacks</title>
+---
+layout: default
+title: Understanding Man-in-the-Middle Attacks
+---
+
+
   <style>
-    /* === RESET & BASE === */
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-    
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      margin: 0;
-      padding: 20px;
+      margin: 0; 
       background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
-      min-height: 100vh;
-      color: #333;
-      line-height: 1.6;
+      min-height: 100vh; color: #333; line-height: 1.6;
+    }
+    .container { 
+      max-width: 900px; 
+      margin: 0 auto; 
+      padding: 20px;
     }
     
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    /* === HEADER === */
-    .header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    
+    .header { text-align: center; margin-bottom: 30px; }
     .header-icon {
-      width: 72px;
-      height: 72px;
+      width: 72px; height: 72px;
       background: linear-gradient(135deg, #E53935, #C62828);
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      box-shadow: 0 8px 24px rgba(229, 57, 53, 0.3);
+      border-radius: 20px; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; box-shadow: 0 8px 24px rgba(229, 57, 53, 0.3);
     }
-    
-    .header-icon svg {
-      width: 36px;
-      height: 36px;
-      fill: none;
-      stroke: white;
-      stroke-width: 2;
-    }
-    
-    .header h1 {
-      font-size: 28px;
-      margin: 0 0 10px;
-      color: #1a1a2e;
-    }
-    
-    .header p {
-      font-size: 18px;
-      color: #666;
-      margin: 0;
-    }
+    .header-icon svg { width: 36px; height: 36px; fill: none; stroke: white; stroke-width: 2; }
+    .header h1 { font-size: 28px; margin: 0 0 10px; color: #1a1a2e; }
+    .header p { font-size: 18px; color: #666; margin: 0; }
 
-    /* === TAB NAVIGATION === */
-    .tab-nav {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    
+    .tab-nav { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
     .tab-btn {
-      flex: 1;
-      padding: 16px 12px;
-      border: none;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      background: white;
-      color: #666;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      flex: 1; min-width: 70px; padding: 14px 8px; border: none; border-radius: 12px;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;
+      background: white; color: #666; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
-    
     .tab-btn.active {
       background: linear-gradient(135deg, #E53935, #C62828);
-      color: white;
-      box-shadow: 0 4px 16px rgba(229, 57, 53, 0.4);
+      color: white; box-shadow: 0 4px 16px rgba(229, 57, 53, 0.4);
     }
 
-    /* === PLAY/PAUSE BUTTON === */
-    .controls {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    
+    .controls { text-align: center; margin-bottom: 20px; }
     .play-btn {
-      padding: 12px 30px;
-      font-size: 16px;
-      font-weight: 600;
-      border: none;
-      border-radius: 25px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      min-height: 50px;
+      padding: 12px 30px; font-size: 16px; font-weight: 600; border: none;
+      border-radius: 25px; cursor: pointer; transition: all 0.3s ease; min-height: 50px;
     }
-    
-    .play-btn.playing {
-      background: linear-gradient(135deg, #FF9800, #F57C00);
-      color: white;
-    }
-    
-    .play-btn.paused {
-      background: linear-gradient(135deg, #4CAF50, #43A047);
-      color: white;
-    }
+    .play-btn.playing { background: linear-gradient(135deg, #FF9800, #F57C00); color: white; }
+    .play-btn.paused { background: linear-gradient(135deg, #4CAF50, #43A047); color: white; }
 
-    /* === TAB CONTENT === */
-    .tab-content {
-      display: none;
-    }
-    
-    .tab-content.active {
-      display: block;
-      animation: fadeIn 0.4s ease;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* === ANIMATION STAGE === */
-    .stage {
-      background: #1a1a2e;
-      border-radius: 16px;
-      padding: 30px;
-      min-height: 380px;
-      position: relative;
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-    
-    .stage-status {
-      position: absolute;
-      top: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: white;
-      padding: 10px 24px;
-      border-radius: 25px;
-      font-size: 15px;
-      font-weight: 600;
-      color: #333;
-      white-space: nowrap;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      transition: all 0.3s ease;
-    }
-    
-    .stage-status.danger {
-      background: #FFEBEE;
-      color: #C62828;
-    }
-    
-    .stage-status.safe {
-      background: #E8F5E9;
-      color: #2E7D32;
-    }
-
-    /* === ENTITY BOXES === */
-    .entity {
-      position: absolute;
-      padding: 16px 20px;
-      border-radius: 12px;
-      text-align: center;
-      transition: all 0.5s ease;
-      min-width: 100px;
-    }
-    
-    .entity svg {
-      width: 40px;
-      height: 40px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 1.5;
-      display: block;
-      margin: 0 auto 8px;
-    }
-    
-    .entity-label {
-      font-size: 14px;
-      font-weight: 600;
-    }
-    
-    .entity.user {
-      background: linear-gradient(135deg, #4A90E2, #357ABD);
-      color: white;
-      border: 2px solid #64B5F6;
-    }
-    
-    .entity.server {
-      background: linear-gradient(135deg, #4CAF50, #43A047);
-      color: white;
-      border: 2px solid #81C784;
-    }
-    
-    .entity.attacker {
-      background: linear-gradient(135deg, #E53935, #C62828);
-      color: white;
-      border: 2px solid #EF5350;
-      opacity: 0;
-      transform: scale(0.8);
-      transition: all 0.5s ease;
-    }
-    
-    .entity.attacker.visible {
-      opacity: 1;
-      transform: scale(1);
-    }
-    
-    .entity.router {
-      background: linear-gradient(135deg, #FF9800, #F57C00);
-      color: white;
-      border: 2px solid #FFB74D;
-    }
-    
-    .entity.coffee-wifi {
-      background: linear-gradient(135deg, #795548, #5D4037);
-      color: white;
-      border: 2px solid #8D6E63;
-    }
-
-    /* === MESSAGE BUBBLES === */
-    .message {
-      position: absolute;
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 500;
-      max-width: 150px;
-      opacity: 0;
-      transition: all 0.4s ease;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    }
-    
-    .message.visible {
-      opacity: 1;
-    }
-    
-    .message.safe {
-      background: #E8F5E9;
-      color: #2E7D32;
-      border: 1px solid #A5D6A7;
-    }
-    
-    .message.danger {
-      background: #FFEBEE;
-      color: #C62828;
-      border: 1px solid #EF9A9A;
-    }
-    
-    .message.neutral {
-      background: white;
-      color: #333;
-      border: 1px solid #ddd;
-    }
-
-    /* === ANIMATED LINES === */
-    .connection-line {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-    
-    .line {
-      stroke-width: 3;
-      fill: none;
-      stroke-dasharray: 8, 4;
-    }
-    
-    .line.safe {
-      stroke: #4CAF50;
-    }
-    
-    .line.danger {
-      stroke: #E53935;
-    }
-    
-    .line.neutral {
-      stroke: #9E9E9E;
-    }
-    
-    .line.animated {
-      animation: dashMove 1s linear infinite;
-    }
-    
-    @keyframes dashMove {
-      from { stroke-dashoffset: 12; }
-      to { stroke-dashoffset: 0; }
-    }
-    
-    .line-group {
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-    
-    .line-group.visible {
-      opacity: 1;
-    }
-
-    /* === LOCK ICONS === */
-    .lock-icon {
-      position: absolute;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: all 0.3s ease;
-    }
-    
-    .lock-icon.visible {
-      opacity: 1;
-    }
-    
-    .lock-icon.locked {
-      background: #4CAF50;
-    }
-    
-    .lock-icon.unlocked {
-      background: #E53935;
-    }
-    
-    .lock-icon svg {
-      width: 16px;
-      height: 16px;
-      stroke: white;
-      fill: none;
-      stroke-width: 2;
-    }
-
-    /* === EXPLANATION CARD === */
     .explanation {
-      background: white;
-      border-radius: 16px;
-      padding: 25px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      background: white; border-radius: 16px; padding: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 20px;
     }
+    .explanation h3 { font-size: 22px; margin: 0 0 16px; }
+    .explanation h3.danger { color: #E53935; }
+    .explanation h3.warning { color: #FF9800; }
+    .explanation h3.safe { color: #4CAF50; }
+    .explanation p { font-size: 17px; color: #555; margin-bottom: 16px; }
     
-    .explanation h3 {
-      color: #E53935;
-      font-size: 22px;
-      margin: 0 0 16px;
-    }
-    
-    .explanation h3.safe {
-      color: #4CAF50;
-    }
-    
-    .explanation p {
-      font-size: 17px;
-      color: #555;
-      margin-bottom: 20px;
-    }
-    
-    .point {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      padding: 14px 16px;
-      border-radius: 10px;
-      margin-bottom: 12px;
-    }
-    
+    .point { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; border-radius: 10px; margin-bottom: 12px; }
     .point.red { background: #FFEBEE; }
     .point.green { background: #E8F5E9; }
     .point.orange { background: #FFF3E0; }
     .point.blue { background: #E3F2FD; }
-    
-    .point-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    
+    .point-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .point.red .point-icon { background: #E53935; }
     .point.green .point-icon { background: #4CAF50; }
     .point.orange .point-icon { background: #FF9800; }
     .point.blue .point-icon { background: #2196F3; }
+    .point-icon svg { width: 16px; height: 16px; stroke: white; fill: none; stroke-width: 3; }
+    .point span { font-size: 16px; color: #555; }
     
-    .point-icon svg {
-      width: 16px;
-      height: 16px;
-      stroke: white;
-      fill: none;
-      stroke-width: 3;
-    }
-    
-    .point span {
-      font-size: 16px;
-      color: #555;
-    }
-    
-    .key-point {
-      margin-top: 20px;
-      padding: 18px;
-      background: #f8fafc;
-      border-radius: 10px;
-      font-size: 16px;
-    }
-    
-    .key-point.warning {
-      background: #FFF3E0;
-      border-left: 4px solid #FF9800;
-    }
-    
-    .key-point.success {
-      background: #E8F5E9;
-      border-left: 4px solid #4CAF50;
-    }
-    
-    .key-point strong {
-      color: #333;
-    }
+    .key-point { margin-top: 20px; padding: 18px; border-radius: 10px; font-size: 16px; }
+    .key-point.warning { background: #FFF3E0; border-left: 4px solid #FF9800; }
+    .key-point.danger { background: #FFEBEE; border-left: 4px solid #E53935; }
+    .key-point.success { background: #E8F5E9; border-left: 4px solid #4CAF50; }
+    .key-point strong { color: #333; }
 
-    /* === RESPONSIVE === */
+    .stage {
+      background: #1a1a2e; border-radius: 16px; padding: 30px;
+      min-height: 360px; position: relative; overflow: hidden;
+    }
+    .stage-status {
+      position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+      background: white; padding: 10px 20px; border-radius: 25px;
+      font-size: 14px; font-weight: 600; color: #333;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2); transition: all 0.3s ease;
+      max-width: 90%; text-align: center; white-space: nowrap; z-index: 20;
+    }
+    .stage-status.danger { background: #FFEBEE; color: #C62828; }
+    .stage-status.safe { background: #E8F5E9; color: #2E7D32; }
+    .stage-status.warning { background: #FFF3E0; color: #E65100; }
+
+    .entity {
+      position: absolute; padding: 14px 16px; border-radius: 12px;
+      text-align: center; transition: all 0.5s ease; min-width: 80px;
+    }
+    .entity svg { width: 32px; height: 32px; stroke: currentColor; fill: none; stroke-width: 1.5; display: block; margin: 0 auto 6px; }
+    .entity-label { font-size: 12px; font-weight: 600; }
+    .entity.user { background: linear-gradient(135deg, #4A90E2, #357ABD); color: white; border: 2px solid #64B5F6; }
+    .entity.user.protected { background: linear-gradient(135deg, #4CAF50, #43A047); border: 2px solid #81C784; box-shadow: 0 0 15px rgba(76,175,80,0.5); }
+    .entity.server { background: linear-gradient(135deg, #4CAF50, #43A047); color: white; border: 2px solid #81C784; }
+    .entity.attacker { background: linear-gradient(135deg, #E53935, #C62828); color: white; border: 2px solid #EF5350; opacity: 0; transform: scale(0.8); transition: all 0.5s ease; }
+    .entity.attacker.visible { opacity: 1; transform: scale(1); }
+    .entity.wifi { background: linear-gradient(135deg, #795548, #5D4037); color: white; border: 2px solid #8D6E63; }
+    .entity.vpn { background: linear-gradient(135deg, #FF9800, #F57C00); color: white; border: 2px solid #FFB74D; }
+
+    .message { position: absolute; padding: 10px 14px; border-radius: 10px; font-size: 12px; font-weight: 500; max-width: 160px; opacity: 0; transition: all 0.4s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+    .message.visible { opacity: 1; }
+    .message.safe { background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7; }
+    .message.danger { background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A; }
+    .message.warning { background: #FFF3E0; color: #E65100; border: 1px solid #FFCC80; }
+    .message.neutral { background: white; color: #333; border: 1px solid #ddd; }
+
+    .connection-line { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+    .line { stroke-width: 3; fill: none; stroke-dasharray: 8, 4; }
+    .line.safe { stroke: #4CAF50; }
+    .line.danger { stroke: #E53935; }
+    .line.warning { stroke: #FF9800; }
+    .line.neutral { stroke: #9E9E9E; }
+    .line.animated { animation: dashMove 1s linear infinite; }
+    @keyframes dashMove { from { stroke-dashoffset: 12; } to { stroke-dashoffset: 0; } }
+    .line-group { opacity: 0; transition: opacity 0.4s ease; }
+    .line-group.visible { opacity: 1; }
+
+    .lock-icon { position: absolute; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: all 0.3s ease; }
+    .lock-icon.visible { opacity: 1; }
+    .lock-icon.locked { background: #4CAF50; }
+    .lock-icon.unlocked { background: #E53935; }
+    .lock-icon svg { width: 16px; height: 16px; stroke: white; fill: none; stroke-width: 2; }
+
+    .data-packet {
+      position: absolute; padding: 8px 12px; border-radius: 8px;
+      font-size: 11px; font-weight: 600; font-family: monospace;
+      opacity: 0; transition: all 0.6s ease; white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .data-packet.visible { opacity: 1; }
+    .data-packet.original { background: #FFF3E0; color: #E65100; border: 2px solid #FFB74D; }
+    .data-packet.encrypted { background: #E8F5E9; color: #2E7D32; border: 2px solid #81C784; }
+
+    .tunnel {
+      position: absolute; height: 50px;
+      background: linear-gradient(90deg, transparent 0%, rgba(76,175,80,0.15) 10%, rgba(76,175,80,0.25) 50%, rgba(76,175,80,0.15) 90%, transparent 100%);
+      border-top: 2px dashed #4CAF50; border-bottom: 2px dashed #4CAF50;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.5s ease;
+    }
+    .tunnel.visible { opacity: 1; }
+    .tunnel-label { background: #4CAF50; color: white; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+
+    .vpn-prompt {
+      position: absolute; padding: 8px 12px; border-radius: 8px; font-size: 12px;
+      font-weight: 600; background: #FF9800; color: white; opacity: 0;
+      transition: all 0.5s ease; white-space: nowrap;
+    }
+    .vpn-prompt.visible { opacity: 1; }
+
     @media (max-width: 600px) {
       body { padding: 16px; }
       .header h1 { font-size: 24px; }
-      .tab-btn { padding: 14px 8px; font-size: 13px; }
+      .tab-btn { padding: 12px 6px; font-size: 11px; min-width: 60px; }
       .stage { min-height: 320px; padding: 20px; }
-      .entity { padding: 12px 14px; min-width: 80px; }
-      .entity svg { width: 32px; height: 32px; }
-      .entity-label { font-size: 12px; }
-      .message { font-size: 11px; padding: 8px 10px; max-width: 120px; }
+      .entity { padding: 10px 12px; min-width: 70px; }
+      .entity svg { width: 26px; height: 26px; }
+      .entity-label { font-size: 10px; }
+      .message { font-size: 10px; padding: 8px 10px; max-width: 130px; }
+      .stage-status { font-size: 12px; padding: 8px 14px; }
+      .data-packet { font-size: 9px; padding: 6px 8px; }
     }
   </style>
-</head>
-<body>
+
   <div class="container">
-    <!-- Header -->
     <div class="header">
       <div class="header-icon">
         <svg viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
       </div>
       <h1>Man-in-the-Middle Attacks</h1>
-      <p>Learn how attackers intercept your data and how to stay safe</p>
+      <p>Learn how attackers intercept data and how to stay safe</p>
     </div>
 
-    <!-- Tab Navigation -->
     <div class="tab-nav">
-      <button class="tab-btn active" data-tab="1">🔓 The Attack</button>
-      <button class="tab-btn" data-tab="2">☕ Public WiFi</button>
-      <button class="tab-btn" data-tab="3">🔒 Stay Safe</button>
-    </div>
-
-    <!-- Play/Pause Control -->
-    <div class="controls">
-      <button class="play-btn playing" id="playBtn">⏸ Pause Animation</button>
+      <button class="tab-btn active" data-tab="1">🔓 Attack</button>
+      <button class="tab-btn" data-tab="2">☕ WiFi Risk</button>
+      <button class="tab-btn" data-tab="3">⚠️ Hidden Danger</button>
+      <button class="tab-btn" data-tab="4">🔒 Stay Safe</button>
+      <button class="tab-btn" data-tab="5">📋 Summary</button>
     </div>
 
     <!-- Tab 1: The Attack -->
     <div class="tab-content active" id="tab1">
+      <div class="explanation">
+        <h3 class="danger">What is a Man-in-the-Middle Attack?</h3>
+        <p>Imagine sending a letter to your bank, but someone secretly opens it, reads it, and then sends it along. That's what happens in this attack.</p>
+        <div class="point red">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
+          <span>An attacker <strong>positions themselves between you and the website</strong></span>
+        </div>
+        <div class="point red">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+          <span>They can <strong>see everything you send</strong> - passwords, messages, bank details</span>
+        </div>
+        <div class="point red">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+          <span>They can even <strong>change your messages</strong> before passing them on</span>
+        </div>
+        <div class="key-point warning">
+          <strong>⚠️ Warning:</strong> You often won't know an attack is happening. Everything looks normal while your data is being stolen.
+        </div>
+      </div>
+      <div class="controls"><button class="play-btn playing" id="playBtn1">⏸ Pause</button></div>
       <div class="stage" id="stage1">
         <div class="stage-status" id="status1">Normal secure connection</div>
-        
-        <!-- User (left) -->
         <div class="entity user" style="left: 8%; top: 50%; transform: translateY(-50%);">
           <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           <div class="entity-label">You</div>
         </div>
-        
-        <!-- Bank Server (right) -->
         <div class="entity server" style="right: 8%; top: 50%; transform: translateY(-50%);">
-          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
           <div class="entity-label">Bank</div>
         </div>
-        
-        <!-- Attacker (middle, hidden initially) -->
         <div class="entity attacker" id="attacker1" style="left: 50%; top: 50%; transform: translate(-50%, -50%);">
           <svg viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
           <div class="entity-label">Attacker</div>
         </div>
-        
-        <!-- Messages -->
-        <div class="message safe" id="msg1-safe" style="left: 25%; top: 25%;">🔒 Password: ****</div>
-        <div class="message danger" id="msg1-stolen" style="left: 38%; top: 20%;">👁 Password: secret123</div>
-        
-        <!-- Connection Lines -->
+        <div class="message safe" id="msg1-safe" style="left: 25%; top: 28%;">🔒 Password: ****</div>
+        <div class="message danger" id="msg1-stolen" style="left: 40%; top: 22%;">👁 Password: secret123</div>
         <svg class="connection-line">
-          <!-- Direct safe connection -->
-          <g class="line-group" id="line1-safe">
-            <line class="line safe animated" x1="18%" y1="50%" x2="82%" y2="50%"/>
-          </g>
-          <!-- Intercepted connections -->
+          <g class="line-group" id="line1-safe"><line class="line safe animated" x1="18%" y1="50%" x2="82%" y2="50%"/></g>
           <g class="line-group" id="line1-danger">
             <line class="line danger animated" x1="18%" y1="50%" x2="45%" y2="50%"/>
             <line class="line danger animated" x1="55%" y1="50%" x2="82%" y2="50%"/>
           </g>
         </svg>
-        
-        <!-- Lock indicator -->
-        <div class="lock-icon locked" id="lock1-safe" style="left: 48%; top: 38%;">
-          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        </div>
-        <div class="lock-icon unlocked" id="lock1-danger" style="left: 48%; top: 38%;">
-          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
-        </div>
-      </div>
-
-      <div class="explanation">
-        <h3>What is a Man-in-the-Middle Attack?</h3>
-        <p>Imagine sending a letter to your bank, but someone secretly opens it, reads it, and then sends it along. That's essentially what happens in this attack.</p>
-        
-        <div class="point red">
-          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
-          <span>An attacker <strong>positions themselves between you and the website</strong> you're visiting</span>
-        </div>
-        
-        <div class="point red">
-          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
-          <span>They can <strong>see everything you send</strong> - passwords, messages, bank details</span>
-        </div>
-        
-        <div class="point red">
-          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
-          <span>They can even <strong>change your messages</strong> before passing them on</span>
-        </div>
-        
-        <div class="key-point warning">
-          <strong>⚠️ Warning:</strong> You often won't know an attack is happening. Everything looks normal on your screen while your data is being stolen.
-        </div>
+        <div class="lock-icon locked" id="lock1-safe" style="left: 48%; top: 38%;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div class="lock-icon unlocked" id="lock1-danger" style="left: 48%; top: 38%;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg></div>
       </div>
     </div>
 
-    <!-- Tab 2: Public WiFi Danger -->
+    <!-- Tab 2: Public WiFi Risk -->
     <div class="tab-content" id="tab2">
+      <div class="explanation">
+        <h3 class="warning">There is Always a Risk with Public WiFi</h3>
+        <p>Free WiFi at coffee shops, airports, and hotels is convenient - but it's also where attacks commonly happen.</p>
+        <div class="point orange">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01"/></svg></div>
+          <span><strong>Fake hotspots:</strong> Attackers create WiFi with names like "CoffeeShop_Free"</span>
+        </div>
+        <div class="point orange">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01"/></svg></div>
+          <span><strong>Network snooping:</strong> Others on the same network may see your traffic</span>
+        </div>
+        <div class="point red">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
+          <span><strong>What they steal:</strong> Login credentials, emails, banking info</span>
+        </div>
+        <div class="key-point warning">
+          <strong>☕ Remember:</strong> Just because WiFi is available doesn't mean it's safe. Be cautious with ANY public network.
+        </div>
+      </div>
+      <div class="controls"><button class="play-btn playing" id="playBtn2">⏸ Pause</button></div>
       <div class="stage" id="stage2">
         <div class="stage-status" id="status2">You're at a coffee shop...</div>
-        
-        <!-- User with laptop (left) -->
         <div class="entity user" style="left: 8%; top: 50%; transform: translateY(-50%);">
           <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           <div class="entity-label">You</div>
         </div>
-        
-        <!-- Coffee Shop WiFi (middle-left) -->
-        <div class="entity coffee-wifi" id="wifi2" style="left: 35%; top: 50%; transform: translateY(-50%);">
+        <div class="entity wifi" id="wifi2" style="left: 38%; top: 50%; transform: translateY(-50%);">
           <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
           <div class="entity-label">Free WiFi</div>
         </div>
-        
-        <!-- Attacker (middle, hidden initially) -->
-        <div class="entity attacker" id="attacker2" style="left: 35%; top: 18%;">
+        <div class="entity attacker" id="attacker2" style="left: 38%; top: 15%;">
           <svg viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
           <div class="entity-label">Hacker</div>
         </div>
-        
-        <!-- Real Internet (right) -->
         <div class="entity server" style="right: 8%; top: 50%; transform: translateY(-50%);">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           <div class="entity-label">Internet</div>
         </div>
-        
-        <!-- Messages -->
-        <div class="message neutral" id="msg2-connect" style="left: 15%; top: 25%;">Connecting to WiFi...</div>
-        <div class="message danger" id="msg2-fake" style="left: 28%; top: 12%;">📡 Fake "Free WiFi"</div>
-        <div class="message danger" id="msg2-stealing" style="right: 30%; top: 20%;">🔓 Reading your data...</div>
-        
-        <!-- Connection Lines -->
+        <div class="message neutral" id="msg2-connect" style="left: 18%; top: 28%;">Connecting to WiFi...</div>
+        <div class="message danger" id="msg2-fake" style="left: 30%; top: 10%;">📡 Fake hotspot!</div>
+        <div class="message danger" id="msg2-stealing" style="right: 25%; top: 22%;">🔓 Reading your data...</div>
         <svg class="connection-line">
-          <g class="line-group" id="line2-connect">
-            <line class="line neutral animated" x1="18%" y1="50%" x2="32%" y2="50%"/>
-          </g>
-          <g class="line-group" id="line2-toInternet">
-            <line class="line neutral animated" x1="45%" y1="50%" x2="82%" y2="50%"/>
-          </g>
-          <g class="line-group" id="line2-hacker">
-            <line class="line danger animated" x1="38%" y1="35%" x2="38%" y2="45%"/>
-          </g>
+          <g class="line-group" id="line2-connect"><line class="line neutral animated" x1="18%" y1="50%" x2="35%" y2="50%"/></g>
+          <g class="line-group" id="line2-toInternet"><line class="line neutral animated" x1="48%" y1="50%" x2="82%" y2="50%"/></g>
+          <g class="line-group" id="line2-hacker"><line class="line danger animated" x1="42%" y1="32%" x2="42%" y2="42%"/></g>
         </svg>
       </div>
+    </div>
 
+    <!-- Tab 3: Hidden Dangers -->
+    <div class="tab-content" id="tab3">
       <div class="explanation">
-        <h3>The Public WiFi Trap</h3>
-        <p>Free WiFi at coffee shops, airports, and hotels is convenient - but it's also a favorite hunting ground for attackers.</p>
-        
-        <div class="point orange">
-          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01"/></svg></div>
-          <span><strong>Fake hotspots:</strong> Attackers create WiFi networks with names like "Free Coffee WiFi" or "Airport_Free"</span>
-        </div>
-        
-        <div class="point orange">
-          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01"/></svg></div>
-          <span><strong>Same network snooping:</strong> Even on legitimate WiFi, others on the network may be able to see your traffic</span>
-        </div>
-        
+        <h3 class="danger">A Password Does NOT Mean It's Safe</h3>
+        <p>Many people think if a WiFi network has a password, it must be secure. <strong>This is not true.</strong></p>
         <div class="point red">
           <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
-          <span><strong>What they steal:</strong> Login credentials, emails, banking info, personal messages</span>
+          <span><strong>Attackers can copy passwords:</strong> The café password on the wall? A hacker can use it too</span>
         </div>
-        
-        <div class="key-point warning">
-          <strong>☕ Remember:</strong> That "Free WiFi" might be free because someone wants to steal your data. If you didn't have to ask staff for the password, be suspicious.
+        <div class="point red">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
+          <span><strong>Attackers can make cards:</strong> They might hand out cards with "their" WiFi password</span>
+        </div>
+        <div class="point red">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
+          <span><strong>Genuine networks get hacked:</strong> Even the real café WiFi could be compromised</span>
+        </div>
+        <div class="key-point danger">
+          <strong>🔓 Key Message:</strong> Having a password does NOT mean a network is authentic or secure. All public WiFi carries risk.
+        </div>
+      </div>
+      <div class="controls"><button class="play-btn playing" id="playBtn3">⏸ Pause</button></div>
+      <div class="stage" id="stage3">
+        <div class="stage-status" id="status3">Two networks with the same password...</div>
+        <div class="entity user" style="left: 50%; top: 75%; transform: translateX(-50%);">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <div class="entity-label">You</div>
+        </div>
+        <div class="entity wifi" id="realWifi" style="left: 15%; top: 25%;">
+          <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+          <div class="entity-label">CafeWiFi 🔒</div>
+        </div>
+        <div class="entity wifi" id="fakeWifi" style="right: 15%; top: 25%;">
+          <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+          <div class="entity-label">CafeWiFi 🔒</div>
+        </div>
+        <div class="message safe" id="msg3-real" style="left: 8%; top: 55%;">✓ Genuine network</div>
+        <div class="message danger" id="msg3-fake" style="right: 8%; top: 55%;">⚠️ Fake - same password!</div>
+        <div class="message warning" id="msg3-warning" style="left: 50%; top: 48%; transform: translateX(-50%);">Both have passwords!</div>
+        <div class="entity attacker" id="attacker3" style="right: 18%; top: 8%;">
+          <svg viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          <div class="entity-label">Attacker</div>
         </div>
       </div>
     </div>
 
-    <!-- Tab 3: How to Stay Safe -->
-    <div class="tab-content" id="tab3">
-      <div class="stage" id="stage3">
-        <div class="stage-status safe" id="status3">How to protect yourself</div>
+    <!-- Tab 4: Stay Safe with Encryption - UPDATED -->
+    <div class="tab-content" id="tab4">
+      <div class="explanation">
+        <h3 class="safe">How to Protect Yourself</h3>
+        <p>The good news: encryption scrambles your data so attackers can only see gibberish. Watch how it works below!</p>
+        <div class="point green">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <span><strong>Make sure websites use HTTPS:</strong> Your browser will warn you if a connection is not secure</span>
+        </div>
+        <div class="point green">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <span><strong>Use a VPN:</strong> Creates an encrypted tunnel - attackers see only scrambled data</span>
+        </div>
+        <div class="point green">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <span><strong>Avoid sensitive tasks on public WiFi:</strong> Or use your mobile data instead</span>
+        </div>
+        <div class="key-point success">
+          <strong>✅ Watch below:</strong> See how your password gets scrambled so attackers can't read it!
+        </div>
+      </div>
+      <div class="controls"><button class="play-btn playing" id="playBtn4">⏸ Pause</button></div>
+      <div class="stage" id="stage4">
+        <div class="stage-status safe" id="status4">Your data is protected with encryption</div>
         
-        <!-- User (left) -->
-        <div class="entity user" style="left: 8%; top: 50%; transform: translateY(-50%);">
+        <!-- User (transforms to protected) -->
+        <div class="entity user" id="user4" style="left: 5%; top: 50%; transform: translateY(-50%);">
           <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <div class="entity-label">You</div>
+          <div class="entity-label" id="user4-label">You</div>
         </div>
         
-        <!-- VPN Shield (middle) -->
-        <div class="entity router" id="vpn3" style="left: 38%; top: 50%; transform: translateY(-50%); opacity: 0;">
-          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <div class="entity-label">VPN</div>
-        </div>
+        <!-- VPN Prompt (near user) -->
+        <div class="vpn-prompt" id="vpn-prompt" style="left: 5%; top: 28%;">🛡️ Turn on VPN</div>
         
-        <!-- Blocked Attacker -->
-        <div class="entity attacker" id="attacker3" style="left: 38%; top: 15%;">
+        <!-- Attacker (positioned to the side, not covering title) -->
+        <div class="entity attacker" id="attacker4" style="right: 20%; top: 18%;">
           <svg viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-          <div class="entity-label">Blocked!</div>
+          <div class="entity-label">Attacker</div>
         </div>
         
-        <!-- Server (right) -->
-        <div class="entity server" style="right: 8%; top: 50%; transform: translateY(-50%);">
-          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <!-- Bank -->
+        <div class="entity server" style="right: 5%; top: 50%; transform: translateY(-50%);">
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
           <div class="entity-label">Bank</div>
         </div>
         
-        <!-- HTTPS indicator -->
-        <div class="message safe" id="msg3-https" style="right: 15%; top: 25%;">🔒 https://bank.com</div>
-        <div class="message safe" id="msg3-encrypted" style="left: 25%; top: 70%;">🔐 Encrypted tunnel</div>
+        <!-- Encrypted tunnel (clear, nothing behind it) -->
+        <div class="tunnel" id="tunnel4" style="left: 18%; right: 15%; top: 50%; transform: translateY(-50%);">
+          <span class="tunnel-label">🔒 ENCRYPTED TUNNEL</span>
+        </div>
         
-        <!-- Connection Lines -->
+        <!-- Data packets - BELOW tunnel -->
+        <div class="data-packet original" id="packet-original" style="left: 5%; top: 75%;">📄 Password: MySecret123</div>
+        <div class="data-packet encrypted" id="packet-encrypted" style="left: 38%; top: 75%;">🔐 x7$mK9#pL2@qR!</div>
+        <div class="data-packet original" id="packet-decrypted" style="right: 5%; top: 75%;">📄 Password: MySecret123</div>
+        
+        <!-- Attacker message - near attacker, not covering title -->
+        <div class="message danger" id="msg4-confused" style="right: 38%; top: 18%;">❓ Can't read: x7$mK9#...</div>
+        <div class="message safe" id="msg4-safe" style="right: 5%; top: 75%;">✅ Bank receives password</div>
+        
+        <!-- Connection lines -->
         <svg class="connection-line">
-          <g class="line-group" id="line3-safe">
-            <line class="line safe animated" x1="18%" y1="50%" x2="82%" y2="50%"/>
-          </g>
-          <g class="line-group" id="line3-blocked">
-            <line class="line danger" x1="42%" y1="32%" x2="42%" y2="42%" stroke-dasharray="4,4"/>
-            <line class="line safe" x1="36%" y1="42%" x2="48%" y2="42%" stroke-width="5"/>
-          </g>
+          <g class="line-group" id="line4-safe"><line class="line safe animated" x1="18%" y1="50%" x2="85%" y2="50%"/></g>
         </svg>
         
-        <!-- Lock indicator -->
-        <div class="lock-icon locked" id="lock3" style="left: 55%; top: 42%;">
-          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        </div>
+        <div class="lock-icon locked" id="lock4" style="right: 18%; top: 42%;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
       </div>
+    </div>
 
+    <!-- Tab 5: Summary of All Tips -->
+    <div class="tab-content" id="tab5">
       <div class="explanation">
-        <h3 class="safe">How to Protect Yourself</h3>
-        <p>The good news: with a few simple habits, you can make man-in-the-middle attacks nearly impossible.</p>
+        <h3 class="safe">📋 Safety Tips Summary</h3>
+        <p>Here are all the key tips to remember when using public WiFi and the internet:</p>
         
+        <h4 style="color: #E53935; margin: 24px 0 12px; font-size: 18px;">🚨 The Dangers</h4>
+        <div class="point red">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
+          <span>Attackers can position themselves between you and websites to steal your data</span>
+        </div>
+        <div class="point red">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
+          <span>Fake WiFi hotspots can look identical to real ones - same name and password</span>
+        </div>
+        <div class="point red">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
+          <span>A WiFi password does NOT mean the network is safe or genuine</span>
+        </div>
+
+        <h4 style="color: #4CAF50; margin: 24px 0 12px; font-size: 18px;">✅ How to Stay Safe</h4>
         <div class="point green">
           <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-          <span><strong>Look for HTTPS:</strong> Always check for the 🔒 padlock and "https://" in your browser. This encrypts your connection.</span>
+          <span><strong>Make sure websites use HTTPS:</strong> Your browser will warn you if a connection is not secure</span>
         </div>
-        
         <div class="point green">
           <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-          <span><strong>Use a VPN:</strong> A VPN creates a secure tunnel that attackers cannot see into, even on public WiFi.</span>
+          <span><strong>Use a VPN:</strong> It creates an encrypted tunnel so attackers only see scrambled gibberish</span>
         </div>
-        
         <div class="point green">
           <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-          <span><strong>Avoid sensitive tasks on public WiFi:</strong> Don't do banking or enter passwords on coffee shop WiFi.</span>
+          <span><strong>Use mobile data for sensitive tasks:</strong> Your phone's data connection is generally safer than public WiFi</span>
         </div>
-        
-        <div class="point blue">
+        <div class="point green">
           <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-          <span><strong>Use mobile data instead:</strong> Your phone's 4G/5G is much safer than public WiFi for sensitive tasks.</span>
+          <span><strong>Avoid banking on public WiFi:</strong> Wait until you're on a trusted network</span>
         </div>
-        
-        <div class="key-point success">
-          <strong>✅ Quick Check:</strong> Before entering any password or payment info, look at your browser's address bar. Do you see 🔒 and "https://"? If not, don't enter sensitive information.
+        <div class="point green">
+          <div class="point-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <span><strong>Ask staff for the real WiFi name:</strong> Don't just pick a network that looks right</span>
+        </div>
+
+        <div class="key-point success" style="margin-top: 24px;">
+          <strong>💡 Remember:</strong> When in doubt, use your mobile data or wait until you're home. Your security is worth the wait!
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    // === STATE ===
     let currentTab = 1;
-    let isPlaying = true;
-    let animationPhase = 0;
-    let animationInterval = null;
+    let isPlaying = [true, true, true, true, false];
+    let animationPhase = [0, 0, 0, 0, 0];
+    let animationIntervals = [null, null, null, null, null];
 
-    // === DOM ELEMENTS ===
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
-    const playBtn = document.getElementById('playBtn');
+    const playBtns = [
+      document.getElementById('playBtn1'),
+      document.getElementById('playBtn2'),
+      document.getElementById('playBtn3'),
+      document.getElementById('playBtn4')
+    ];
 
     // Tab 1 elements
     const status1 = document.getElementById('status1');
@@ -724,6 +485,7 @@
     // Tab 2 elements
     const status2 = document.getElementById('status2');
     const attacker2 = document.getElementById('attacker2');
+    const wifi2 = document.getElementById('wifi2');
     const msg2Connect = document.getElementById('msg2-connect');
     const msg2Fake = document.getElementById('msg2-fake');
     const msg2Stealing = document.getElementById('msg2-stealing');
@@ -733,80 +495,79 @@
 
     // Tab 3 elements
     const status3 = document.getElementById('status3');
-    const vpn3 = document.getElementById('vpn3');
+    const realWifi = document.getElementById('realWifi');
+    const fakeWifi = document.getElementById('fakeWifi');
     const attacker3 = document.getElementById('attacker3');
-    const msg3Https = document.getElementById('msg3-https');
-    const msg3Encrypted = document.getElementById('msg3-encrypted');
-    const line3Safe = document.getElementById('line3-safe');
-    const line3Blocked = document.getElementById('line3-blocked');
-    const lock3 = document.getElementById('lock3');
+    const msg3Real = document.getElementById('msg3-real');
+    const msg3Fake = document.getElementById('msg3-fake');
+    const msg3Warning = document.getElementById('msg3-warning');
 
-    // === TAB SWITCHING ===
+    // Tab 4 elements
+    const status4 = document.getElementById('status4');
+    const user4 = document.getElementById('user4');
+    const user4Label = document.getElementById('user4-label');
+    const vpnPrompt = document.getElementById('vpn-prompt');
+    const attacker4 = document.getElementById('attacker4');
+    const tunnel4 = document.getElementById('tunnel4');
+    const packetOriginal = document.getElementById('packet-original');
+    const packetEncrypted = document.getElementById('packet-encrypted');
+    const packetDecrypted = document.getElementById('packet-decrypted');
+    const msg4Confused = document.getElementById('msg4-confused');
+    const msg4Safe = document.getElementById('msg4-safe');
+    const line4Safe = document.getElementById('line4-safe');
+    const lock4 = document.getElementById('lock4');
+
     function switchTab(tab) {
       currentTab = tab;
-      animationPhase = 0;
-      
-      tabBtns.forEach(btn => {
-        btn.classList.toggle('active', parseInt(btn.dataset.tab) === tab);
-      });
-      
-      tabContents.forEach(content => content.classList.remove('active'));
+      tabBtns.forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.tab) === tab));
+      tabContents.forEach(c => c.classList.remove('active'));
       document.getElementById('tab' + tab).classList.add('active');
-      
-      resetAnimation();
-      if (isPlaying) startAnimation();
+      animationPhase[tab - 1] = 0;
+      updateAnimation(tab);
+      if (isPlaying[tab - 1]) startAnimation(tab);
     }
 
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => switchTab(parseInt(btn.dataset.tab)));
+    tabBtns.forEach(btn => btn.addEventListener('click', () => switchTab(parseInt(btn.dataset.tab))));
+
+    playBtns.forEach((btn, i) => {
+      btn.addEventListener('click', () => {
+        isPlaying[i] = !isPlaying[i];
+        btn.textContent = isPlaying[i] ? '⏸ Pause' : '▶ Play';
+        btn.classList.toggle('playing', isPlaying[i]);
+        btn.classList.toggle('paused', !isPlaying[i]);
+        isPlaying[i] ? startAnimation(i + 1) : stopAnimation(i + 1);
+      });
     });
 
-    // === PLAY/PAUSE ===
-    playBtn.addEventListener('click', () => {
-      isPlaying = !isPlaying;
-      playBtn.textContent = isPlaying ? '⏸ Pause Animation' : '▶ Play Animation';
-      playBtn.classList.toggle('playing', isPlaying);
-      playBtn.classList.toggle('paused', !isPlaying);
-      
-      if (isPlaying) {
-        startAnimation();
-      } else {
-        stopAnimation();
-      }
-    });
-
-    // === ANIMATION CONTROL ===
-    function startAnimation() {
-      stopAnimation();
-      animationInterval = setInterval(() => {
-        animationPhase++;
-        const maxPhase = currentTab === 1 ? 5 : currentTab === 2 ? 5 : 4;
-        if (animationPhase > maxPhase) animationPhase = 0;
-        updateAnimation();
-      }, 2500);
+    function startAnimation(tab) {
+      stopAnimation(tab);
+      const i = tab - 1;
+      // SLOWER for Tab 4: 3500ms instead of 2500ms
+      const interval = tab === 4 ? 3500 : 2500;
+      animationIntervals[i] = setInterval(() => {
+        animationPhase[i]++;
+        const max = tab === 1 ? 5 : tab === 2 ? 5 : tab === 3 ? 4 : 8;
+        if (animationPhase[i] > max) animationPhase[i] = 0;
+        updateAnimation(tab);
+      }, interval);
     }
 
-    function stopAnimation() {
-      if (animationInterval) {
-        clearInterval(animationInterval);
-        animationInterval = null;
+    function stopAnimation(tab) {
+      if (animationIntervals[tab - 1]) {
+        clearInterval(animationIntervals[tab - 1]);
+        animationIntervals[tab - 1] = null;
       }
     }
 
-    function resetAnimation() {
-      animationPhase = 0;
-      updateAnimation();
+    function updateAnimation(tab) {
+      if (tab === 1) updateTab1();
+      else if (tab === 2) updateTab2();
+      else if (tab === 3) updateTab3();
+      else if (tab === 4) updateTab4();
     }
 
-    function updateAnimation() {
-      if (currentTab === 1) updateTab1Animation();
-      else if (currentTab === 2) updateTab2Animation();
-      else if (currentTab === 3) updateTab3Animation();
-    }
-
-    // === TAB 1: THE ATTACK ===
-    function updateTab1Animation() {
-      // Reset
+    function updateTab1() {
+      const p = animationPhase[0];
       status1.className = 'stage-status';
       attacker1.classList.remove('visible');
       msg1Safe.classList.remove('visible');
@@ -816,51 +577,16 @@
       lock1Safe.classList.remove('visible');
       lock1Danger.classList.remove('visible');
 
-      switch(animationPhase) {
-        case 0:
-          status1.textContent = 'Normal secure connection';
-          line1Safe.classList.add('visible');
-          lock1Safe.classList.add('visible');
-          break;
-        case 1:
-          status1.textContent = '🔒 You send your password securely...';
-          line1Safe.classList.add('visible');
-          lock1Safe.classList.add('visible');
-          msg1Safe.classList.add('visible');
-          break;
-        case 2:
-          status1.textContent = '⚠️ But an attacker intercepts the connection!';
-          status1.classList.add('danger');
-          attacker1.classList.add('visible');
-          line1Danger.classList.add('visible');
-          break;
-        case 3:
-          status1.textContent = '🚨 Attacker can see your password!';
-          status1.classList.add('danger');
-          attacker1.classList.add('visible');
-          line1Danger.classList.add('visible');
-          lock1Danger.classList.add('visible');
-          msg1Stolen.classList.add('visible');
-          break;
-        case 4:
-          status1.textContent = '😱 Your data is stolen!';
-          status1.classList.add('danger');
-          attacker1.classList.add('visible');
-          line1Danger.classList.add('visible');
-          lock1Danger.classList.add('visible');
-          msg1Stolen.classList.add('visible');
-          break;
-        case 5:
-          status1.textContent = 'The attack happens invisibly...';
-          status1.classList.add('danger');
-          attacker1.classList.add('visible');
-          break;
-      }
+      if (p === 0) { status1.textContent = 'Normal secure connection'; line1Safe.classList.add('visible'); lock1Safe.classList.add('visible'); }
+      else if (p === 1) { status1.textContent = '🔒 You send your password...'; line1Safe.classList.add('visible'); lock1Safe.classList.add('visible'); msg1Safe.classList.add('visible'); }
+      else if (p === 2) { status1.textContent = '⚠️ Attacker intercepts!'; status1.classList.add('danger'); attacker1.classList.add('visible'); line1Danger.classList.add('visible'); }
+      else if (p === 3) { status1.textContent = '🚨 They see your password!'; status1.classList.add('danger'); attacker1.classList.add('visible'); line1Danger.classList.add('visible'); lock1Danger.classList.add('visible'); msg1Stolen.classList.add('visible'); }
+      else if (p === 4) { status1.textContent = '😱 Your data is stolen!'; status1.classList.add('danger'); attacker1.classList.add('visible'); line1Danger.classList.add('visible'); msg1Stolen.classList.add('visible'); }
+      else { status1.textContent = 'It happens invisibly...'; status1.classList.add('danger'); attacker1.classList.add('visible'); }
     }
 
-    // === TAB 2: PUBLIC WIFI ===
-    function updateTab2Animation() {
-      // Reset
+    function updateTab2() {
+      const p = animationPhase[1];
       status2.className = 'stage-status';
       attacker2.classList.remove('visible');
       msg2Connect.classList.remove('visible');
@@ -869,100 +595,132 @@
       line2Connect.classList.remove('visible');
       line2ToInternet.classList.remove('visible');
       line2Hacker.classList.remove('visible');
+      wifi2.style.background = '';
 
-      switch(animationPhase) {
-        case 0:
-          status2.textContent = "You're at a coffee shop...";
-          break;
-        case 1:
-          status2.textContent = 'You connect to "Free WiFi"';
-          msg2Connect.classList.add('visible');
-          line2Connect.classList.add('visible');
-          break;
-        case 2:
-          status2.textContent = "⚠️ But it's a fake hotspot!";
-          status2.classList.add('danger');
-          msg2Connect.classList.add('visible');
-          msg2Fake.classList.add('visible');
-          line2Connect.classList.add('visible');
-          attacker2.classList.add('visible');
-          break;
-        case 3:
-          status2.textContent = '🚨 Hacker controls the network';
-          status2.classList.add('danger');
-          attacker2.classList.add('visible');
-          line2Connect.classList.add('visible');
-          line2ToInternet.classList.add('visible');
-          line2Hacker.classList.add('visible');
-          break;
-        case 4:
-          status2.textContent = '👁 They see everything you do';
-          status2.classList.add('danger');
-          attacker2.classList.add('visible');
-          line2Connect.classList.add('visible');
-          line2ToInternet.classList.add('visible');
-          line2Hacker.classList.add('visible');
-          msg2Stealing.classList.add('visible');
-          break;
-        case 5:
-          status2.textContent = '💳 Passwords, emails, bank details stolen';
-          status2.classList.add('danger');
-          attacker2.classList.add('visible');
-          msg2Stealing.classList.add('visible');
-          break;
-      }
+      if (p === 0) { status2.textContent = "You're at a coffee shop..."; }
+      else if (p === 1) { status2.textContent = 'You see "Free WiFi"...'; msg2Connect.classList.add('visible'); line2Connect.classList.add('visible'); }
+      else if (p === 2) { status2.textContent = "⚠️ But it's a fake hotspot!"; status2.classList.add('danger'); msg2Connect.classList.add('visible'); msg2Fake.classList.add('visible'); line2Connect.classList.add('visible'); attacker2.classList.add('visible'); wifi2.style.background = 'linear-gradient(135deg, #E53935, #C62828)'; }
+      else if (p === 3) { status2.textContent = '🚨 Hacker controls it'; status2.classList.add('danger'); attacker2.classList.add('visible'); line2Connect.classList.add('visible'); line2ToInternet.classList.add('visible'); line2Hacker.classList.add('visible'); wifi2.style.background = 'linear-gradient(135deg, #E53935, #C62828)'; }
+      else if (p === 4) { status2.textContent = '👁 They see everything'; status2.classList.add('danger'); attacker2.classList.add('visible'); line2Connect.classList.add('visible'); line2ToInternet.classList.add('visible'); line2Hacker.classList.add('visible'); msg2Stealing.classList.add('visible'); wifi2.style.background = 'linear-gradient(135deg, #E53935, #C62828)'; }
+      else { status2.textContent = '💳 Data stolen!'; status2.classList.add('danger'); attacker2.classList.add('visible'); msg2Stealing.classList.add('visible'); wifi2.style.background = 'linear-gradient(135deg, #E53935, #C62828)'; }
     }
 
-    // === TAB 3: STAY SAFE ===
-    function updateTab3Animation() {
-      // Reset
-      status3.className = 'stage-status safe';
-      vpn3.style.opacity = '0';
+    function updateTab3() {
+      const p = animationPhase[2];
+      status3.className = 'stage-status';
       attacker3.classList.remove('visible');
-      msg3Https.classList.remove('visible');
-      msg3Encrypted.classList.remove('visible');
-      line3Safe.classList.remove('visible');
-      line3Blocked.classList.remove('visible');
-      lock3.classList.remove('visible');
+      msg3Real.classList.remove('visible');
+      msg3Fake.classList.remove('visible');
+      msg3Warning.classList.remove('visible');
+      realWifi.style.background = '';
+      fakeWifi.style.background = '';
 
-      switch(animationPhase) {
-        case 0:
-          status3.textContent = 'How to protect yourself';
-          break;
-        case 1:
-          status3.textContent = '🔒 Use HTTPS websites';
-          msg3Https.classList.add('visible');
-          line3Safe.classList.add('visible');
-          lock3.classList.add('visible');
-          break;
-        case 2:
-          status3.textContent = '🛡 Use a VPN for extra protection';
-          vpn3.style.opacity = '1';
-          msg3Encrypted.classList.add('visible');
-          line3Safe.classList.add('visible');
-          lock3.classList.add('visible');
-          break;
-        case 3:
-          status3.textContent = '🚫 Attackers are blocked!';
-          vpn3.style.opacity = '1';
-          attacker3.classList.add('visible');
-          line3Safe.classList.add('visible');
-          line3Blocked.classList.add('visible');
-          lock3.classList.add('visible');
-          break;
-        case 4:
-          status3.textContent = '✅ Your data stays safe';
-          vpn3.style.opacity = '1';
-          msg3Https.classList.add('visible');
-          msg3Encrypted.classList.add('visible');
-          line3Safe.classList.add('visible');
-          lock3.classList.add('visible');
-          break;
+      if (p === 0) { status3.textContent = 'Two networks, same name & password'; msg3Warning.classList.add('visible'); }
+      else if (p === 1) { status3.textContent = 'One is real...'; realWifi.style.background = 'linear-gradient(135deg, #4CAF50, #43A047)'; msg3Real.classList.add('visible'); }
+      else if (p === 2) { status3.textContent = '⚠️ One is FAKE!'; status3.classList.add('danger'); realWifi.style.background = 'linear-gradient(135deg, #4CAF50, #43A047)'; fakeWifi.style.background = 'linear-gradient(135deg, #E53935, #C62828)'; msg3Real.classList.add('visible'); msg3Fake.classList.add('visible'); attacker3.classList.add('visible'); }
+      else if (p === 3) { status3.textContent = '🔒 Both have passwords!'; status3.classList.add('warning'); realWifi.style.background = 'linear-gradient(135deg, #4CAF50, #43A047)'; fakeWifi.style.background = 'linear-gradient(135deg, #E53935, #C62828)'; msg3Real.classList.add('visible'); msg3Fake.classList.add('visible'); attacker3.classList.add('visible'); }
+      else { status3.textContent = 'Password ≠ Safe!'; status3.classList.add('danger'); fakeWifi.style.background = 'linear-gradient(135deg, #E53935, #C62828)'; msg3Fake.classList.add('visible'); attacker3.classList.add('visible'); }
+    }
+
+    function updateTab4() {
+      const p = animationPhase[3];
+      status4.className = 'stage-status safe';
+      
+      // Reset all
+      user4.classList.remove('protected');
+      user4Label.textContent = 'You';
+      vpnPrompt.classList.remove('visible');
+      attacker4.classList.remove('visible');
+      tunnel4.classList.remove('visible');
+      packetOriginal.classList.remove('visible');
+      packetEncrypted.classList.remove('visible');
+      packetDecrypted.classList.remove('visible');
+      msg4Confused.classList.remove('visible');
+      msg4Safe.classList.remove('visible');
+      line4Safe.classList.remove('visible');
+      lock4.classList.remove('visible');
+
+      if (p === 0) {
+        // Show "Turn on VPN" prompt
+        status4.textContent = 'First, turn on your VPN...';
+        vpnPrompt.classList.add('visible');
+      }
+      else if (p === 1) {
+        // Transform user to protected
+        status4.textContent = '🛡️ VPN activated!';
+        user4.classList.add('protected');
+        user4Label.textContent = 'You + VPN';
+      }
+      else if (p === 2) {
+        // Show original password
+        status4.textContent = 'You want to send your password...';
+        user4.classList.add('protected');
+        user4Label.textContent = 'You + VPN';
+        packetOriginal.classList.add('visible');
+      }
+      else if (p === 3) {
+        // VPN encrypts
+        status4.textContent = '🔐 VPN encrypts your data...';
+        user4.classList.add('protected');
+        user4Label.textContent = 'You + VPN';
+        packetOriginal.classList.add('visible');
+        packetEncrypted.classList.add('visible');
+      }
+      else if (p === 4) {
+        // Tunnel appears
+        status4.textContent = '🔒 Data travels through encrypted tunnel';
+        user4.classList.add('protected');
+        user4Label.textContent = 'You + VPN';
+        tunnel4.classList.add('visible');
+        packetEncrypted.classList.add('visible');
+        line4Safe.classList.add('visible');
+      }
+      else if (p === 5) {
+        // Attacker appears but confused
+        status4.textContent = '❓ Attacker sees only gibberish!';
+        user4.classList.add('protected');
+        user4Label.textContent = 'You + VPN';
+        tunnel4.classList.add('visible');
+        attacker4.classList.add('visible');
+        packetEncrypted.classList.add('visible');
+        msg4Confused.classList.add('visible');
+        line4Safe.classList.add('visible');
+      }
+      else if (p === 6) {
+        // Bank decrypts
+        status4.textContent = '🔓 Bank decrypts your data safely';
+        user4.classList.add('protected');
+        user4Label.textContent = 'You + VPN';
+        tunnel4.classList.add('visible');
+        attacker4.classList.add('visible');
+        msg4Confused.classList.add('visible');
+        packetDecrypted.classList.add('visible');
+        line4Safe.classList.add('visible');
+        lock4.classList.add('visible');
+      }
+      else if (p === 7) {
+        // Success
+        status4.textContent = '✅ Password received - attacker blocked!';
+        user4.classList.add('protected');
+        user4Label.textContent = 'You + VPN';
+        tunnel4.classList.add('visible');
+        attacker4.classList.add('visible');
+        msg4Confused.classList.add('visible');
+        packetDecrypted.classList.add('visible');
+        msg4Safe.classList.add('visible');
+        line4Safe.classList.add('visible');
+        lock4.classList.add('visible');
+      }
+      else {
+        // Final message
+        status4.textContent = '🛡️ Encryption keeps you safe!';
+        user4.classList.add('protected');
+        user4Label.textContent = 'You + VPN';
+        tunnel4.classList.add('visible');
+        line4Safe.classList.add('visible');
+        lock4.classList.add('visible');
       }
     }
 
-    // === INITIALIZE ===
-    startAnimation();
+    startAnimation(1);
   </script>
-</body>
-</html>

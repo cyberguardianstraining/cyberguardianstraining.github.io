@@ -1,9 +1,9 @@
----
-layout: default
-title: Intro To Password Managers
----
-
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Understanding Password Managers</title>
   <style>
     * {
       box-sizing: border-box;
@@ -13,6 +13,7 @@ title: Intro To Password Managers
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       margin: 0;
+      padding: 20px;
       background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
       min-height: 100vh;
       color: #333;
@@ -22,7 +23,6 @@ title: Intro To Password Managers
     .container {
       max-width: 800px;
       margin: 0 auto;
-      padding: 20px;
     }
     
     /* Header */
@@ -515,6 +515,8 @@ title: Intro To Password Managers
       .encryption-arrow { font-size: 20px; }
     }
   </style>
+</head>
+<body>
   <div class="container">
     <!-- Header -->
     <div class="header">
@@ -575,9 +577,8 @@ title: Intro To Password Managers
           <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
           Create Your Master Password
         </h3>
-        <p>This is the <strong>ONE password</strong> you need to remember. Make it strong but memorable. For example, if you use the "three random words" technique, consider adding an extra word:</p>
-        <p style="background:#f0f0f0;padding:14px 18px;border-radius:8px;font-family:monospace;font-size:17px;margin:16px 0 0">Camcorder-Fossil-Jelly-Appealing</p>
-        <p>It's ok to write your master password down somewhere very safe if you're worried you'll forget it.</p>
+        <p>This is the <strong>ONE password</strong> you need to remember. Make it strong but memorable. For example:</p>
+        <p style="background:#f0f0f0;padding:14px 18px;border-radius:8px;font-family:monospace;font-size:17px;margin:16px 0 0">MyDog&amp;MyGrandson2024!</p>
       </div>
 
       <div class="form-group">
@@ -589,8 +590,8 @@ title: Intro To Password Managers
           </button>
         </div>
         <div class="success-message" id="masterSuccess">
-          <!-- <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> -->
-          <span>Remember, this should be a strong one! This password protects all the others.</span>
+          <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>Good! This is the only password you need to remember.</span>
         </div>
       </div>
 
@@ -616,8 +617,7 @@ title: Intro To Password Managers
 
     <!-- Step 3: Try It Yourself -->
     <div class="step-content" id="step3">
-      <h2>Adding passwords</h2>
-      <p>Many password managers can do this for you by prompting you when you log into a website. Let's try adding one manually:</p>
+      <h2>Try It Yourself</h2>
       
       <div class="info-card">
         <h3>
@@ -627,7 +627,7 @@ title: Intro To Password Managers
         
         <div class="form-group" style="margin-top:16px">
           <label>Website Name:</label>
-          <input type="text" id="newSite" placeholder="e.g., Gmail, Apple ID">
+          <input type="text" id="newSite" placeholder="e.g., Gmail, Bank of America">
         </div>
 
         <div class="form-group">
@@ -760,3 +760,5 @@ title: Intro To Password Managers
       return div.innerHTML;
     }
   </script>
+</body>
+</html>

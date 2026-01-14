@@ -1,7 +1,7 @@
 # Site settings
 title: CyberGuardians
 description: Cybersecurity education resources
-baseurl: "/CyberGuardiansTraining" # the subpath of your site, e.g. /BruteForceDemo
+baseurl: "" # the subpath of your site, e.g. /BruteForceDemo
 url: "" # the base hostname & protocol for your site
 
 # Build settings
