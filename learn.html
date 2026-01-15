@@ -107,6 +107,10 @@ active_page: learn
         margin-top: 0;
     }
 
+    .tip-card h3 {
+        margin-bottom: 8px;
+    }
+
     .card-content {
         padding: 16px;
     }
@@ -139,6 +143,26 @@ active_page: learn
         background: #ccc;
         cursor: not-allowed;
     }
+
+    /* Section Styles */
+    .tips-section {
+        margin-bottom: 40px;
+    }
+
+    .tips-section > h2 {
+        margin-bottom: 8px;
+        color: #333;
+    }
+
+    .tips-section > p {
+        color: #666;
+        margin-bottom: 20px;
+    }
+
+    .tip-card h3 {
+        margin-top: 0;
+    }
+
 </style>
 
 <!-- Page-specific header -->
@@ -157,147 +181,235 @@ active_page: learn
                         <li>
                             <a href="#red-flags">Red Flags</a>
                             <ul>
-                                <li><a href="#fake-news-red-flags">Fake news red flags</a></li>
-                                <li><a href="#scam-red-flags">Scam red flags</a></li>
+                                <li><a href="#fake-news-red-flags">Fake news</a></li>
+                                <li><a href="#scam-red-flags">Scams</a></li>
                             </ul>
                         </li>
                         <li>
-                            <a href="#public-wifi">Public WiFi</a>
-                        </li>
-                        <li>
-                            <a href="#safe-shopping">Safe Shopping</a>
-                        </li>
-                        <!-- Add more sections here as you create them -->
-                        <!--
-                        <li>
-                            <a href="#passwords">Passwords</a>
+                            <a href="#safe-browsing">Safe Browsing</a>
                             <ul>
-                                <li><a href="#creating-passwords">Creating strong passwords</a></li>
-                                <li><a href="#password-managers">Using password managers</a></li>
+                                <li><a href="#keeping-devices-secure">Keeping Devices Secure</a></li>
+                                <li><a href="#public-wifi">Public WiFi</a></li>
+                                <li><a href="#safe-shopping">Safe shopping</a></li>
                             </ul>
                         </li>
-                        -->
+                        <li>
+                            <a href="#authentication">Authentication</a>
+                            <ul>
+                                <li><a href="#strong-passwords">Making strong passwords</a></li>
+                                <li><a href="#managing-passwords">Managing passwords</a></li>
+                                <!-- <li><a href="#two-factor">Two factor authentication</a></li> -->
+                            </ul>
+                        </li>
                     </ul>
                 </nav>
             </aside>
 
             <!-- Main Content -->
             <div class="tips-content">
-        <!-- Red Flags Card -->
-        <div class="tip-card" id="red-flags">
-            <div class="card-content">
-                <h2>Red Flags to be aware of</h2>
-                <p>Below you will find red flags for both fake news and scams. You can use these to check against
-                    fake news/potential scam emails you receive, to help determine their credibility.
-                </p>
-                <h3 id="fake-news-red-flags">🚨Fake news red flags🚨</h3>
-                <p>Warnings signs:</p>
 
-                <ul class="learning-list">
-                    <li>🚩 URL mimics real news (e.g., "bbc-news-daily.com" instead of "bbc.co.uk")</li>
-                    <li>🚩 Excessive spelling or grammar errors</li>
-                    <li>🚩 No "About Us" page or contact information</li>
-                    <li>🚩 Sensational headlines that don't match the story</li>
-                    <li>🚩 No author name or credentials</li>
-                    <li>🚩 Lots of pop-up ads</li>
-                    <li>🚩 "Share before it's taken down!" urgency</li>
-                </ul>
+                <!-- Red Flags Section -->
+                <section class="tips-section" id="red-flags">
+                    <h2>Red Flags</h2>
+                    <p>Use these to check against fake news and potential scam emails you receive, to help determine their credibility.</p>
 
-                <h3 id="scam-red-flags">🚨Scam red flags🚨</h3>
-                <p>Trust your instincts</p>
+                    <!-- Fake News Red Flags Card -->
+                    <div class="tip-card" id="fake-news-red-flags">
+                        <div class="card-content">
+                            <h3>🚨 Fake News Red Flags 🚨</h3>
+                            <p>Warning signs:</p>
+                            <ul class="learning-list">
+                                <li>🚩 URL mimics real news (e.g., "bbc-news-daily.com" instead of "bbc.co.uk")</li>
+                                <li>🚩 Excessive spelling or grammar errors</li>
+                                <li>🚩 No "About Us" page or contact information</li>
+                                <li>🚩 Sensational headlines that don't match the story</li>
+                                <li>🚩 No author name or credentials</li>
+                                <li>🚩 Lots of pop-up ads</li>
+                                <li>🚩 "Share before it's taken down!" urgency</li>
+                            </ul>
+                        </div>
+                        <div class="card-actions">
+                            <button class="download-btn" onclick="downloadCard(this, 'fake-news-red-flags')">
+                                Save Image
+                            </button>
+                        </div>
+                    </div>
 
-                <ul class="learning-list">
-                    <li>🚨 Urgency ("act now or lose out!")</li>
-                    <li>🚨 Too good to be true</li>
-                    <li>🚨 Request for payment or personal details</li>
-                    <li>🚨 Pressure or threats</li>
-                    <li>🚨 Emotional manipulation</li>
-                    <li>🚨 Poor spelling/grammar in "official" messages</li>
-                    <li>🚨 Unusual payment methods (gift cards, cryptocurrency)</li>
-                </ul>
-            </div>
-            <div class="card-actions">
-                <button class="download-btn" onclick="downloadCard(this, 'red-flags')">
-                    Save Image
-                </button>
-            </div>
-        </div>
+                    <!-- Scam Red Flags Card -->
+                    <div class="tip-card" id="scam-red-flags">
+                        <div class="card-content">
+                            <h3>🚨 Scam Red Flags 🚨</h3>
+                            <p>Trust your instincts</p>
+                            <ul class="learning-list">
+                                <li>🚨 Urgency ("act now or lose out!")</li>
+                                <li>🚨 Too good to be true</li>
+                                <li>🚨 Request for payment or personal details</li>
+                                <li>🚨 Pressure or threats</li>
+                                <li>🚨 Emotional manipulation</li>
+                                <li>🚨 Poor spelling/grammar in "official" messages</li>
+                                <li>🚨 Unusual payment methods (gift cards, cryptocurrency)</li>
+                            </ul>
+                        </div>
+                        <div class="card-actions">
+                            <button class="download-btn" onclick="downloadCard(this, 'scam-red-flags')">
+                                Save Image
+                            </button>
+                        </div>
+                    </div>
+                </section>
 
-        <!-- Public WiFi Card -->
-        <div class="tip-card" id="public-wifi">
-            <div class="card-content">
-                <h2>Public WiFi</h2>
-                <p>Public WiFi networks can be dangerous. Here's how to stay safe:</p>
+                <!-- Safe Browsing Section -->
+                <section class="tips-section" id="safe-browsing">
+                    <h2>Safe Browsing</h2>
+                    <p>Tips for staying safe when using the internet.</p>
 
-                <ul class="learning-list">
-                    <li><strong>Only connect to WiFi networks you know and trust</strong><br>
-                        <em>Ask the staff: "What's your official WiFi name and password?"</em></li>
+                    <!-- Keeping Devices Secure Card -->
+                    <div class="tip-card" id="keeping-devices-secure">
+                        <div class="card-content">
+                            <h3>Keeping Devices Secure</h3>
+                            <p>Your devices can be the key to everything you do digitally, so keep them safe:</p>
+                            <ul class="learning-list">
+                                <li><strong>Always accept and install software updates</strong><br>
+                                    <em>These fix known security problems, not just functionality</em></li>
+                                <li><strong>Use a random 6-digit pin on your mobile devices, rather than 4-digits</strong><br>
+                                    <em>Guessing these is manual, and much harder with more digits</em></li>
+                                <li><strong>Biometrics (like fingerprint and face ID) are secure and prevent others seeing your PIN</strong><br>
+                                    <em>You still have to have a good PIN and use it occasionally</em></li>
+                                <li><strong>Most devices have good built in antimalware protection, especially mobile devices</strong><br>
+                                    <em>There are extra paid products available, but research them carefully</em></li>
+                                <li><strong>On mobile devices, always install apps through the App Store / Play Store</strong><br>
+                                    <li><strong>On computers, exercise caution when installing software</strong><br>
+                            </ul>
+                        </div>
+                        <div class="card-actions">
+                            <button class="download-btn" onclick="downloadCard(this, 'keeping-devices-secure')">
+                                Save Image
+                            </button>
+                        </div>
+                    </div>
 
-                    <li><strong>Look for the lock icon - secure networks require passwords</strong><br>
-                        <em>Password-protected networks are safer than open ones</em></li>
+                    <!-- Public WiFi Card -->
+                    <div class="tip-card" id="public-wifi">
+                        <div class="card-content">
+                            <h3>Public WiFi</h3>
+                            <p>Public WiFi networks can be dangerous. Here's how to stay safe:</p>
+                            <ul class="learning-list">
+                                <li><strong>Only connect to WiFi networks you know and trust</strong><br>
+                                    <em>Ask the staff: "What's your official WiFi name and password?"</em></li>
+                                <li><strong>Look for the lock icon - secure networks require passwords</strong><br>
+                                    <em>Password-protected networks are safer than open ones</em></li>
+                                <li><strong>Avoid networks with names like 'FREE WiFi' or 'Public WiFi'</strong><br>
+                                    <em>These generic names are often used by criminals</em></li>
+                                <li><strong>Don't do banking or shopping on public WiFi</strong><br>
+                                    <em>Wait until you're home or use your phone's data instead</em></li>
+                                <li><strong>Use your phone's cellular data when possible</strong><br>
+                                    <em>Your phone's 4G/5G data is much safer than public WiFi</em></li>
+                            </ul>
+                        </div>
+                        <div class="card-actions">
+                            <button class="download-btn" onclick="downloadCard(this, 'public-wifi')">
+                                Save Image
+                            </button>
+                        </div>
+                    </div>
 
-                    <li><strong>Avoid networks with names like 'FREE WiFi' or 'Public WiFi'</strong><br>
-                        <em>These generic names are often used by criminals</em></li>
+                    <!-- Safe Shopping Card -->
+                    <div class="tip-card" id="safe-shopping">
+                        <div class="card-content">
+                            <h3>Safe Online Shopping</h3>
+                            <ul class="learning-list">
+                                <li><strong>Stick to retailers you know, if you can</strong></li>
+                                <li><strong>If you need to use unfamiliar websites, look up reviews for the website (e.g. on trustpilot.com)</strong><br>
+                                    <em>Established businesses will have plenty of reviews - be sure to read the negative ones</em></li>
+                                <li><strong>Pay with a credit card for extra fraud protection</strong></li>
+                                <li><strong>Only save card details on reputable sites</strong></li>
+                                <li><strong>Be very cautious following adverts on social media</strong><br>
+                                    <em>You're much safer searching for products directly</em></li>
+                                <li><strong>Be on the look out for AI-generated product images</strong></li>
+                                <li><strong>Avoid using public WiFi to do online shopping</strong></li>
+                                <li><strong>Consider using services like Paypal, Apple Pay and Google Pay to avoid sharing card details</strong><br>
+                                    <em>These should redirect you to their own login page (e.g. paypal.com) or use your device's authentication to login</em></li>
+                            </ul>
+                        </div>
+                        <div class="card-actions">
+                            <button class="download-btn" onclick="downloadCard(this, 'safe-shopping')">
+                                Save Image
+                            </button>
+                        </div>
+                    </div>
+                </section>
+                <!-- Authentication Section -->
+                <section class="tips-section" id="authentication">
+                    <h2>Authentication</h2>
+                    <p>Keeping your accounts secure with strong passwords and additional protection.</p>
 
-                    <li><strong>Don't do banking or shopping on public WiFi</strong><br>
-                        <em>Wait until you're home or use your phone's data instead</em></li>
+                    <!-- Strong Passwords Card -->
+                    <div class="tip-card" id="strong-passwords">
+                        <div class="card-content">
+                            <h3>Making Strong Passwords</h3>
+                            <ul class="learning-list">
+                                <li><strong>Passwords should be strong and unpredictable</strong></li>
+                                <li><strong>Passwords should (ideally) be unique for every login you have</strong></li>
+                                <li><strong>Password strength relates to length and which characters you use</strong><br>
+                                    <em>Aim for 12 or more characters using mixed case, adding numbers and symbols for extra strength </em></li>
+                                <li><strong>Three or more random words combined can help create memorable, strong passwords</strong><br>
+                                    <em>For example, Speller-Cherisher-Doorbell would be a strong password</em></li>
+                                <li><strong>Don't use personal details or popular references</strong><br>
+                                    <em>Aim for a password nobody has used before</em></li>
+                                <li><strong>Never share your passwords with others</strong><br>
+                                    <em>Legitimate services will never ask for your password</em></li>
+                                <li><strong>Try using a password manager to help you generate and remember strong passwords</strong></li>
+                            </ul>
+                        </div>
+                        <div class="card-actions">
+                            <button class="download-btn" onclick="downloadCard(this, 'strong-passwords')">
+                                Save Image
+                            </button>
+                        </div>
+                    </div>
 
-                    <li><strong>Use your phone's cellular data when possible</strong><br>
-                        <em>Your phone's 4G/5G data is much safer than public WiFi</em></li>
-                </ul>
-            </div>
-            <div class="card-actions">
-                <button class="download-btn" onclick="downloadCard(this, 'public-wifi')">
-                    Save Image
-                </button>
-            </div>
-        </div>
-        <!-- Safe Shopping Card -->
-        <div class="tip-card" id="safe-shopping">
-            <div class="card-content">
-                <h2>Safe Online Shopping</h2>
+                    <!-- Managing Passwords Card -->
+                    <div class="tip-card" id="managing-passwords">
+                        <div class="card-content">
+                            <h3>Managing Passwords</h3>
+                            <ul class="learning-list">
+                                <li><strong>It's very hard to remember many strong passwords!</strong><br>
+                                    <em>You will usually have to make a compromise somewhere</em></li>
+                                <li><strong>Recording your passwords somewhere is safer than having weak passwords or reusing them</strong></li>
+                                <li><strong>Password managers are a recommended practice</strong><br>
+                                    <em>These keep your passwords safe by encrypting them with one strong master password</em></li>
+                                <li><strong>Password managers will help you generate, store, and fill in passwords</strong></li>
+                                <li><strong>You could try a single very strong password that is altered systematically for different websites</strong><br>
+                                    <em>Be careful - if someone figures out your system, they could guess your other passwords</em></li>
+                                <li><strong>Even writing passwords down is better than having weak and reused passwords</strong></li>
+                                <li><strong>Check if your passwords have been exposed in data breaches</strong><br>
+                                    <em>Use haveibeenpwned.com to check if your email or passwords have been compromised, or use your password manager if it has these features</em></li>
+                            </ul>
+                        </div>
+                        <div class="card-actions">
+                            <button class="download-btn" onclick="downloadCard(this, 'managing-passwords')">
+                                Save Image
+                            </button>
+                        </div>
+                    </div>
 
-                <ul class="learning-list">
-                    <li><strong>Stick to retailers you know, if you can</strong><br></li>
+                    <!-- Two Factor Authentication Card
+                    <div class="tip-card" id="two-factor">
+                        <div class="card-content">
+                            <h3>Two Factor Authentication</h3>
+                            <ul class="learning-list">
+                                <li><strong>[Tip goes here]</strong></li>
+                            </ul>
+                        </div>
+                        <div class="card-actions">
+                            <button class="download-btn" onclick="downloadCard(this, 'two-factor')">
+                                Save Image
+                            </button>
+                        </div>
+                    </div> -->
+                </section>
 
-                    <li><strong>If you need to use unfamiliar websites, look up reviews for the website (e.g. on trustpilot.com)</strong><br>
-                        <em>Established businesses will have plenty of reviews - be sure to read the negative ones</em></li>
-
-                    <li><strong>Pay with a credit card for extra fraud protection</strong><br></li>
-
-                    <li><strong>Only save card details on reputable sites</strong><br></li>
-
-                    <li><strong>Be very cautious following adverts on social media</strong><br>
-                        <em>You're much safer searching for products directly</em></li>
-
-                    <li><strong>Be on the look out for AI-generated product images</strong><br></li>
-
-                    <li><strong>Avoid using public WiFi to do online shopping</strong><br></li>
-
-                    <li><strong>Consider using services like Paypal, Apple Pay and Google Pay to avoid sharing card details</strong><br>
-                        <em>These should redirect you to their own login page (e.g. paypal.com) or use your device's authentication to login</em></li>
-                </ul>
-            </div>
-            <div class="card-actions">
-                <button class="download-btn" onclick="downloadCard(this, 'safe-shopping')">
-                    Save Image
-                </button>
-            </div>
-        </div>
-        <!---
-        <div class="content-section" id="passwords">
-            <h2>Passwords</h2>
-            <h3 id="creating-passwords">Creating strong passwords</h3>
-            <p>[Content goes here - PLACEHOLDER]</p>
-
-            <ol class="learning-list">
-                <li>[Numbered step - PLACEHOLDER]</li>
-                <li>[Numbered step - PLACEHOLDER]</li>
-                <li>[Numbered step - PLACEHOLDER]</li>
-            </ol>
-        </div>
-        --->
-        <!-- Add more tip-card divs as needed -->
+                <!-- Add more sections as needed -->
             </div><!-- End tips-content -->
         </div><!-- End tips-container -->
     </main>
@@ -313,12 +425,22 @@ async function downloadCard(button, cardId) {
     button.disabled = true;
 
     try {
-        // Capture the card content as an image
-        const canvas = await html2canvas(cardContent, {
+        // Clone the card content and place in a fixed-width off-screen container
+        const clone = cardContent.cloneNode(true);
+        const offscreen = document.createElement('div');
+        offscreen.style.cssText = 'position: absolute; left: -9999px; width: 740px; background: white;';
+        offscreen.appendChild(clone);
+        document.body.appendChild(offscreen);
+
+        // Capture the off-screen content
+        const canvas = await html2canvas(offscreen, {
             scale: 2,
             backgroundColor: '#ffffff',
             logging: false
         });
+
+        // Remove the off-screen container
+        document.body.removeChild(offscreen);
 
         // Create download link for PNG
         const link = document.createElement('a');
