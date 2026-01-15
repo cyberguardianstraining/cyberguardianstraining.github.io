@@ -4,6 +4,9 @@ title: Tips
 active_page: learn
 ---
 
+<!-- Card image capture -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <style>
     .tips-container {
         display: flex;
@@ -90,6 +93,52 @@ active_page: learn
             margin-bottom: 20px;
         }
     }
+
+    /* Tip Card Styles */
+    .tip-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .tip-card h2 {
+        margin-top: 0;
+    }
+
+    .card-content {
+        padding: 16px;
+    }
+
+    .card-actions {
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid #eee;
+        text-align: right;
+    }
+
+    .download-btn {
+        background: #4A90E2;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .download-btn:hover {
+        background: #357ABD;
+    }
+
+    .download-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
 </style>
 
 <!-- Page-specific header -->
@@ -134,87 +183,106 @@ active_page: learn
 
             <!-- Main Content -->
             <div class="tips-content">
-        <!-- Example structure for learning content sections -->
-        <div class="content-section" id="red-flags">
-            <h2>Red Flags to be aware of</h2>
-            <p>Below you will find red flags for both fake news and scams. You can use these to check against
-                fake news/potential scam emails you receive, to help determine their credibility.
-            </p>
-            <h3 id="fake-news-red-flags">🚨Fake news red flags🚨</h3>
-            <p>Warnings signs:</p>
+        <!-- Red Flags Card -->
+        <div class="tip-card" id="red-flags">
+            <div class="card-content">
+                <h2>Red Flags to be aware of</h2>
+                <p>Below you will find red flags for both fake news and scams. You can use these to check against
+                    fake news/potential scam emails you receive, to help determine their credibility.
+                </p>
+                <h3 id="fake-news-red-flags">🚨Fake news red flags🚨</h3>
+                <p>Warnings signs:</p>
 
-            <ul class="learning-list">
-                <li>🚩 URL mimics real news (e.g., "bbc-news-daily.com" instead of "bbc.co.uk")</li>
-                            <li>🚩 Excessive spelling or grammar errors</li>
-                            <li>🚩 No "About Us" page or contact information</li>
-                            <li>🚩 Sensational headlines that don't match the story</li>
-                            <li>🚩 No author name or credentials</li>
-                            <li>🚩 Lots of pop-up ads</li>
-                            <li>🚩 "Share before it's taken down!" urgency</li>
-            </ul>
+                <ul class="learning-list">
+                    <li>🚩 URL mimics real news (e.g., "bbc-news-daily.com" instead of "bbc.co.uk")</li>
+                    <li>🚩 Excessive spelling or grammar errors</li>
+                    <li>🚩 No "About Us" page or contact information</li>
+                    <li>🚩 Sensational headlines that don't match the story</li>
+                    <li>🚩 No author name or credentials</li>
+                    <li>🚩 Lots of pop-up ads</li>
+                    <li>🚩 "Share before it's taken down!" urgency</li>
+                </ul>
 
-            <h3 id="scam-red-flags">🚨Scam red flags🚨</h3>
-            <p>Trust your instincts</p>
+                <h3 id="scam-red-flags">🚨Scam red flags🚨</h3>
+                <p>Trust your instincts</p>
 
-            <ul class="learning-list">
-                <li>🚨 Urgency ("act now or lose out!")</li>
-                            <li>🚨 Too good to be true</li>
-                            <li>🚨 Request for payment or personal details</li>
-                            <li>🚨 Pressure or threats</li>
-                            <li>🚨 Emotional manipulation</li>
-                            <li>🚨 Poor spelling/grammar in "official" messages</li>
-                            <li>🚨 Unusual payment methods (gift cards, cryptocurrency)</li>
-            </ul>
+                <ul class="learning-list">
+                    <li>🚨 Urgency ("act now or lose out!")</li>
+                    <li>🚨 Too good to be true</li>
+                    <li>🚨 Request for payment or personal details</li>
+                    <li>🚨 Pressure or threats</li>
+                    <li>🚨 Emotional manipulation</li>
+                    <li>🚨 Poor spelling/grammar in "official" messages</li>
+                    <li>🚨 Unusual payment methods (gift cards, cryptocurrency)</li>
+                </ul>
+            </div>
+            <div class="card-actions">
+                <button class="download-btn" onclick="downloadCard(this, 'red-flags')">
+                    Save Image
+                </button>
+            </div>
         </div>
 
-        <div class="content-section" id="public-wifi">
-            <h2>Public WiFi</h2>
-            <p>Public WiFi networks can be dangerous. Here's how to stay safe:</p>
+        <!-- Public WiFi Card -->
+        <div class="tip-card" id="public-wifi">
+            <div class="card-content">
+                <h2>Public WiFi</h2>
+                <p>Public WiFi networks can be dangerous. Here's how to stay safe:</p>
 
-            <ul class="learning-list">
-                <li><strong>Only connect to WiFi networks you know and trust</strong><br>
-                    <em>Ask the staff: "What's your official WiFi name and password?"</em></li>
+                <ul class="learning-list">
+                    <li><strong>Only connect to WiFi networks you know and trust</strong><br>
+                        <em>Ask the staff: "What's your official WiFi name and password?"</em></li>
 
-                <li><strong>Be suspicious of networks without passwords</strong><br>
-                    <em>Most businesses protect their WiFi with a password</em></li>
+                    <li><strong>Look for the lock icon - secure networks require passwords</strong><br>
+                        <em>Password-protected networks are safer than open ones</em></li>
 
-                <li><strong>Avoid networks with names like 'FREE WiFi' or 'Public WiFi'</strong><br>
-                    <em>These generic names are often used by criminals</em></li>
+                    <li><strong>Avoid networks with names like 'FREE WiFi' or 'Public WiFi'</strong><br>
+                        <em>These generic names are often used by criminals</em></li>
 
-                <li><strong>Don't do banking or shopping on public WiFi</strong><br>
-                    <em>Wait until you're home or use your phone's data instead</em></li>
+                    <li><strong>Don't do banking or shopping on public WiFi</strong><br>
+                        <em>Wait until you're home or use your phone's data instead</em></li>
 
-                <li><strong>Use your phone's cellular data when possible</strong><br>
-                    <em>Your phone's 4G/5G data is much safer than public WiFi</em></li>
-
-                <li><strong>Look for the lock icon - secure networks require passwords</strong><br>
-                    <em>Password-protected networks are safer than open ones</em></li>
-            </ul>
+                    <li><strong>Use your phone's cellular data when possible</strong><br>
+                        <em>Your phone's 4G/5G data is much safer than public WiFi</em></li>
+                </ul>
+            </div>
+            <div class="card-actions">
+                <button class="download-btn" onclick="downloadCard(this, 'public-wifi')">
+                    Save Image
+                </button>
+            </div>
         </div>
-        <div class="content-section" id="safe-shopping">
-            <h2>Safe Online Shopping</h2>            
+        <!-- Safe Shopping Card -->
+        <div class="tip-card" id="safe-shopping">
+            <div class="card-content">
+                <h2>Safe Online Shopping</h2>
 
-            <ul class="learning-list">
-                <li><strong>Stick to retailers you know, if you can</strong><br></li>
+                <ul class="learning-list">
+                    <li><strong>Stick to retailers you know, if you can</strong><br></li>
 
-                <li><strong>If you need to use unfamiliar websites, look up reviews for the website (e.g. on trustpilot.com)</strong><br>
-                    <em>Established businesses will have plenty of reviews - be sure to read the negative ones</em></li>
+                    <li><strong>If you need to use unfamiliar websites, look up reviews for the website (e.g. on trustpilot.com)</strong><br>
+                        <em>Established businesses will have plenty of reviews - be sure to read the negative ones</em></li>
 
-                <li><strong>Pay with a credit card for extra fraud protection</strong><br></li>
+                    <li><strong>Pay with a credit card for extra fraud protection</strong><br></li>
 
-                <li><strong>Only save card details on reputable sites</strong><br></li>
+                    <li><strong>Only save card details on reputable sites</strong><br></li>
 
-                <li><strong>Be very cautious following adverts on social media</strong><br>
-                    <em>You're much safer searching for products directly</em></li>
+                    <li><strong>Be very cautious following adverts on social media</strong><br>
+                        <em>You're much safer searching for products directly</em></li>
 
-                <li><strong>Be on the look out for AI-generated product images</strong><br></li>
+                    <li><strong>Be on the look out for AI-generated product images</strong><br></li>
 
-                <li><strong>Avoid using public WiFi to do online shopping</strong><br></li>
+                    <li><strong>Avoid using public WiFi to do online shopping</strong><br></li>
 
-                <li><strong>Consider using services like Paypal, Apple Pay and Google Pay to avoid sharing card details
-</strong><br>
-                    <em>These should redirect you to their own login page (e.g. paypal.com) or use your device's authentication to login</em></li>
-            </ul>
+                    <li><strong>Consider using services like Paypal, Apple Pay and Google Pay to avoid sharing card details</strong><br>
+                        <em>These should redirect you to their own login page (e.g. paypal.com) or use your device's authentication to login</em></li>
+                </ul>
+            </div>
+            <div class="card-actions">
+                <button class="download-btn" onclick="downloadCard(this, 'safe-shopping')">
+                    Save Image
+                </button>
+            </div>
         </div>
         <!---
         <div class="content-section" id="passwords">
@@ -229,7 +297,41 @@ active_page: learn
             </ol>
         </div>
         --->
-        <!-- Add more content-section divs as needed -->
+        <!-- Add more tip-card divs as needed -->
             </div><!-- End tips-content -->
         </div><!-- End tips-container -->
     </main>
+
+<script>
+async function downloadCard(button, cardId) {
+    const card = document.getElementById(cardId);
+    const cardContent = card.querySelector('.card-content');
+
+    // Disable button and show loading state
+    const originalText = button.textContent;
+    button.textContent = 'Generating...';
+    button.disabled = true;
+
+    try {
+        // Capture the card content as an image
+        const canvas = await html2canvas(cardContent, {
+            scale: 2,
+            backgroundColor: '#ffffff',
+            logging: false
+        });
+
+        // Create download link for PNG
+        const link = document.createElement('a');
+        link.download = cardId + '-tips.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    } catch (error) {
+        console.error('Error generating image:', error);
+        alert('Sorry, there was an error generating the image. Please try again.');
+    } finally {
+        // Restore button state
+        button.textContent = originalText;
+        button.disabled = false;
+    }
+}
+</script>
