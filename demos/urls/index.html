@@ -1,6 +1,6 @@
 ---
 layout: default
-title: URL Hierarchy Visualizer
+title: URL Visualiser
 ---
 
     <style>
@@ -202,21 +202,25 @@ title: URL Hierarchy Visualizer
         
         .domain-content {
             position: absolute;
-            top: 20px;
+            top: 45px;
             font-family: 'Courier New', monospace;
             font-size: 18px;
             font-weight: bold;
             color: #333;
         }
-        
+
         .domain-box {
             background: #E8F4F8;
             border-color: #4A90E2;
             padding: 60px 20px 20px 20px;
         }
-        
+
         .domain-box.has-inner {
             padding-bottom: 20px;
+        }
+
+        .domain-box.has-inner .domain-content {
+            top: 20px;
         }
         
         .domain-box .box-label {
@@ -286,7 +290,7 @@ title: URL Hierarchy Visualizer
         }
     </style>
     <div class="container">
-        <h1>URL Hierarchy Visualizer</h1>
+        <h1>URL Visualiser</h1>
         <p class="intro">
             Learn how website addresses (URLs) work to protect yourself from fake websites and scams. 
             The most important thing is knowing the main <strong>domain name</strong> of the website you are visiting. 
@@ -301,7 +305,7 @@ title: URL Hierarchy Visualizer
                 Try:
                 <span onclick="setExample('docs.google.com')">docs.google.com</span>
                 <span onclick="setExample('https://www.google.com')">https://www.google.com</span>
-                <span onclick="setExample('http://example.com')">http://example.com</span>
+                <span onclick="setExample('http://example.co.uk')">http://example.co.uk</span>
                 <span onclick="setExample('google.fakesite.com')">google.fakesite.com</span>
                 <span onclick="setExample('paypal.secure-login.com/account')">paypal.secure-login.com/account</span>
                 <span onclick="setExample('goog1e.com')">goog1e.com</span>
@@ -557,7 +561,7 @@ title: URL Hierarchy Visualizer
 
             if (hasSubdomains) {
                 html += `<p>The part "<strong>${subdomains.join('.')}</strong>" is called a subdomain. It's just a section within ${domain}'s website. The owner of ${domain} controls all their subdomains. `;
-                html += `Subdomains are always to the left of the main domain. For URLs that have multiple parts separated by full stops (.), like this one, start reading these on the right.</p>`;
+                html += `Subdomains are always to the left of the main domain.<strong> For URLs that have multiple parts separated by full stops (.), like this one, start reading these on the right.</strong></p>`;
             }
 
             if (hasPath) {
