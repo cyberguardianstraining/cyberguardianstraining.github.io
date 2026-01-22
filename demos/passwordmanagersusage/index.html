@@ -1,9 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Understanding Password Managers</title>
+---
+layout: default
+title: Intro To Password Managers
+---
+
+
   <style>
     * {
       box-sizing: border-box;
@@ -13,7 +13,6 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       margin: 0;
-      padding: 20px;
       background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
       min-height: 100vh;
       color: #333;
@@ -23,6 +22,7 @@
     .container {
       max-width: 800px;
       margin: 0 auto;
+      padding: 20px;
     }
     
     /* Header */
@@ -342,9 +342,19 @@
       font-weight: 600;
       font-size: 17px;
       color: #333;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
-    
+
+    .password-item-user {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 2px;
+    }
+
+    .password-item-user em {
+      color: #999;
+    }
+
     .password-item-pass {
       font-family: monospace;
       font-size: 14px;
@@ -515,8 +525,6 @@
       .encryption-arrow { font-size: 20px; }
     }
   </style>
-</head>
-<body>
   <div class="container">
     <!-- Header -->
     <div class="header">
@@ -577,8 +585,9 @@
           <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
           Create Your Master Password
         </h3>
-        <p>This is the <strong>ONE password</strong> you need to remember. Make it strong but memorable. For example:</p>
-        <p style="background:#f0f0f0;padding:14px 18px;border-radius:8px;font-family:monospace;font-size:17px;margin:16px 0 0">MyDog&amp;MyGrandson2024!</p>
+        <p>This is the <strong>ONE password</strong> you need to remember. Make it strong but memorable. For example, if you use the "three random words" technique, consider adding an extra word:</p>
+        <p style="background:#f0f0f0;padding:14px 18px;border-radius:8px;font-family:monospace;font-size:17px;margin:16px 0 0">Camcorder-Fossil-Jelly-Appealing</p>
+        <p>It's ok to write your master password down somewhere very safe if you're worried you'll forget it.</p>
       </div>
 
       <div class="form-group">
@@ -590,8 +599,8 @@
           </button>
         </div>
         <div class="success-message" id="masterSuccess">
-          <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-          <span>Good! This is the only password you need to remember.</span>
+          <!-- <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> -->
+          <span>Remember, this should be a strong one! This password protects all the others.</span>
         </div>
       </div>
 
@@ -617,7 +626,8 @@
 
     <!-- Step 3: Try It Yourself -->
     <div class="step-content" id="step3">
-      <h2>Try It Yourself</h2>
+      <h2>Adding passwords</h2>
+      <p>Many password managers can do this for you by prompting you when you log into a website. Let's try adding one manually:</p>
       
       <div class="info-card">
         <h3>
@@ -627,7 +637,12 @@
         
         <div class="form-group" style="margin-top:16px">
           <label>Website Name:</label>
-          <input type="text" id="newSite" placeholder="e.g., Gmail, Bank of America">
+          <input type="text" id="newSite" placeholder="e.g., Gmail, Apple ID">
+        </div>
+
+        <div class="form-group">
+          <label>Username or Email:</label>
+          <input type="text" id="newUsername" placeholder="e.g., john@example.com">
         </div>
 
         <div class="form-group">
@@ -649,7 +664,7 @@
         <div id="passwordList"></div>
         <div class="passwords-note">
           <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-          <span>All these passwords are safely stored and will be filled in automatically when you visit these websites.</span>
+          <span>All these passwords are safely stored and would be filled in automatically if you were to visit these websites.</span>
         </div>
       </div>
     </div>
@@ -668,6 +683,7 @@
     const eyeIcon = document.getElementById('eyeIcon');
     const masterSuccess = document.getElementById('masterSuccess');
     const newSiteInput = document.getElementById('newSite');
+    const newUsernameInput = document.getElementById('newUsername');
     const newPassInput = document.getElementById('newPass');
     const generateBtn = document.getElementById('generateBtn');
     const saveBtn = document.getElementById('saveBtn');
@@ -722,12 +738,14 @@
     // Save Password
     saveBtn.addEventListener('click', () => {
       const site = newSiteInput.value.trim();
+      const username = newUsernameInput.value.trim();
       const pass = newPassInput.value.trim();
-      
+
       if (site && pass) {
-        savedPasswords.push({ site, password: pass });
+        savedPasswords.push({ site, username, password: pass });
         renderPasswords();
         newSiteInput.value = '';
+        newUsernameInput.value = '';
         newPassInput.value = '';
       }
     });
@@ -744,6 +762,7 @@
         <div class="password-item">
           <div class="password-item-info">
             <div class="password-item-site">${escapeHtml(item.site)}</div>
+            <div class="password-item-user">${item.username ? escapeHtml(item.username) : '<em>No username</em>'}</div>
             <div class="password-item-pass">••••••••••••</div>
           </div>
           <div class="password-item-check">
@@ -760,5 +779,3 @@
       return div.innerHTML;
     }
   </script>
-</body>
-</html>
