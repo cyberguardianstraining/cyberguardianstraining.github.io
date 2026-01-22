@@ -22,6 +22,8 @@ active_page: learn
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         position: sticky;
         top: 20px;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
     }
 
     .tips-sidebar h3 {
@@ -163,6 +165,18 @@ active_page: learn
         margin-top: 0;
     }
 
+    /* Subtext styling */
+    .learning-list em {
+        font-size: 0.9em;
+        display: inline-block;
+        margin-top: 2px;
+        color: #666;
+    }
+
+    .learning-list li {
+        margin-bottom: 8px;
+    }
+
 </style>
 
 <!-- Page-specific header -->
@@ -198,7 +212,14 @@ active_page: learn
                             <ul>
                                 <li><a href="#strong-passwords">Making strong passwords</a></li>
                                 <li><a href="#managing-passwords">Managing passwords</a></li>
-                                <!-- <li><a href="#two-factor">Two factor authentication</a></li> -->
+                                <li><a href="#two-factor">Two factor authentication</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#sharing">Sharing & Digital Legacy</a>
+                            <ul>
+                                <li><a href="#sharing-files">Sharing files & information</a></li>
+                                <li><a href="#digital-legacy">Digital legacy</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -269,16 +290,16 @@ active_page: learn
                             <h3>Keeping Devices Secure</h3>
                             <p>Your devices can be the key to everything you do digitally, so keep them safe:</p>
                             <ul class="learning-list">
-                                <li><strong>Always accept and install software updates</strong><br>
-                                    <em>These fix known security problems, not just functionality</em></li>
-                                <li><strong>Use a random 6-digit pin on your mobile devices, rather than 4-digits</strong><br>
-                                    <em>Guessing these is manual, and much harder with more digits</em></li>
-                                <li><strong>Biometrics (like fingerprint and face ID) are secure and prevent others seeing your PIN</strong><br>
-                                    <em>You still have to have a good PIN and use it occasionally</em></li>
-                                <li><strong>Most devices have good built in antimalware protection, especially mobile devices</strong><br>
-                                    <em>There are extra paid products available, but research them carefully</em></li>
-                                <li><strong>On mobile devices, always install apps through the App Store / Play Store</strong><br>
-                                    <li><strong>On computers, exercise caution when installing software</strong><br>
+                                <li>Always accept and install software updates.<br>
+                                    <em>These fix known security problems, not just functionality.</em></li>
+                                <li>Use a random 6-digit pin on your mobile devices, rather than 4-digits.<br>
+                                    <em>Guessing these is manual, and much harder with more digits.</em></li>
+                                <li>Biometrics (like fingerprint and face ID) are secure and prevent others seeing your PIN.<br>
+                                    <em>You still have to have a good PIN and use it occasionally.</em></li>
+                                <li>Most devices have good built in antimalware protection, especially mobile devices.<br>
+                                    <em>There are extra paid products available, but research them carefully.</em></li>
+                                <li>On mobile devices, always install apps through the App Store / Play Store.</li>
+                                <li>On computers, exercise caution when installing software.</li>
                             </ul>
                         </div>
                         <div class="card-actions">
@@ -294,16 +315,16 @@ active_page: learn
                             <h3>Public WiFi</h3>
                             <p>Public WiFi networks can be dangerous. Here's how to stay safe:</p>
                             <ul class="learning-list">
-                                <li><strong>Only connect to WiFi networks you know and trust</strong><br>
+                                <li>Only connect to WiFi networks you know and trust.<br>
                                     <em>Ask the staff: "What's your official WiFi name and password?"</em></li>
-                                <li><strong>Look for the lock icon - secure networks require passwords</strong><br>
-                                    <em>Password-protected networks are safer than open ones</em></li>
-                                <li><strong>Avoid networks with names like 'FREE WiFi' or 'Public WiFi'</strong><br>
-                                    <em>These generic names are often used by criminals</em></li>
-                                <li><strong>Don't do banking or shopping on public WiFi</strong><br>
-                                    <em>Wait until you're home or use your phone's data instead</em></li>
-                                <li><strong>Use your phone's cellular data when possible</strong><br>
-                                    <em>Your phone's 4G/5G data is much safer than public WiFi</em></li>
+                                <li>Look for the lock icon - secure networks require passwords.<br>
+                                    <em>Password-protected networks are safer than open ones.</em></li>
+                                <li>Avoid networks with names like 'FREE WiFi' or 'Public WiFi'.<br>
+                                    <em>These generic names are often used by criminals.</em></li>
+                                <li>Don't do banking or shopping on public WiFi.<br>
+                                    <em>Wait until you're home or use your phone's data instead.</em></li>
+                                <li>Use your phone's cellular data when possible.<br>
+                                    <em>Your phone's 4G/5G data is much safer than public WiFi.</em></li>
                             </ul>
                         </div>
                         <div class="card-actions">
@@ -318,17 +339,17 @@ active_page: learn
                         <div class="card-content">
                             <h3>Safe Online Shopping</h3>
                             <ul class="learning-list">
-                                <li><strong>Stick to retailers you know, if you can</strong></li>
-                                <li><strong>If you need to use unfamiliar websites, look up reviews for the website (e.g. on trustpilot.com)</strong><br>
-                                    <em>Established businesses will have plenty of reviews - be sure to read the negative ones</em></li>
-                                <li><strong>Pay with a credit card for extra fraud protection</strong></li>
-                                <li><strong>Only save card details on reputable sites</strong></li>
-                                <li><strong>Be very cautious following adverts on social media</strong><br>
-                                    <em>You're much safer searching for products directly</em></li>
-                                <li><strong>Be on the look out for AI-generated product images</strong></li>
-                                <li><strong>Avoid using public WiFi to do online shopping</strong></li>
-                                <li><strong>Consider using services like Paypal, Apple Pay and Google Pay to avoid sharing card details</strong><br>
-                                    <em>These should redirect you to their own login page (e.g. paypal.com) or use your device's authentication to login</em></li>
+                                <li>Stick to retailers you know, if you can.</li>
+                                <li>If you need to use unfamiliar websites, look up reviews for the website (e.g. on trustpilot.com).<br>
+                                    <em>Established businesses will have plenty of reviews - be sure to read the negative ones.</em></li>
+                                <li>Pay with a credit card for extra fraud protection.</li>
+                                <li>Only save card details on reputable sites.</li>
+                                <li>Be very cautious following adverts on social media.<br>
+                                    <em>You're much safer searching for products directly.</em></li>
+                                <li>Be on the look out for AI-generated product images.</li>
+                                <li>Avoid using public WiFi to do online shopping.</li>
+                                <li>Consider using services like Paypal, Apple Pay and Google Pay to avoid sharing card details.<br>
+                                    <em>These should redirect you to their own login page (e.g. paypal.com) or use your device's authentication to login.</em></li>
                             </ul>
                         </div>
                         <div class="card-actions">
@@ -348,17 +369,17 @@ active_page: learn
                         <div class="card-content">
                             <h3>Making Strong Passwords</h3>
                             <ul class="learning-list">
-                                <li><strong>Passwords should be strong and unpredictable</strong></li>
-                                <li><strong>Passwords should (ideally) be unique for every login you have</strong></li>
-                                <li><strong>Password strength relates to length and which characters you use</strong><br>
-                                    <em>Aim for 12 or more characters using mixed case, adding numbers and symbols for extra strength </em></li>
-                                <li><strong>Three or more random words combined can help create memorable, strong passwords</strong><br>
-                                    <em>For example, Speller-Cherisher-Doorbell would be a strong password</em></li>
-                                <li><strong>Don't use personal details or popular references</strong><br>
-                                    <em>Aim for a password nobody has used before</em></li>
-                                <li><strong>Never share your passwords with others</strong><br>
-                                    <em>Legitimate services will never ask for your password</em></li>
-                                <li><strong>Try using a password manager to help you generate and remember strong passwords</strong></li>
+                                <li>Passwords should be strong and unpredictable.</li>
+                                <li>Passwords should (ideally) be unique for every login you have.</li>
+                                <li>Password strength relates to length and which characters you use.<br>
+                                    <em>Aim for 12 or more characters using mixed case, adding numbers and symbols for extra strength.</em></li>
+                                <li>Three or more random words combined can help create memorable, strong passwords.<br>
+                                    <em>For example, Speller-Cherisher-Doorbell would be a strong password.</em></li>
+                                <li>Don't use personal details or popular references.<br>
+                                    <em>Aim for a password nobody has used before.</em></li>
+                                <li>Never share your passwords with others.<br>
+                                    <em>Legitimate services will never ask for your password.</em></li>
+                                <li>Try using a password manager to help you generate and remember strong passwords.</li>
                             </ul>
                         </div>
                         <div class="card-actions">
@@ -373,17 +394,17 @@ active_page: learn
                         <div class="card-content">
                             <h3>Managing Passwords</h3>
                             <ul class="learning-list">
-                                <li><strong>It's very hard to remember many strong passwords!</strong><br>
-                                    <em>You will usually have to make a compromise somewhere</em></li>
-                                <li><strong>Recording your passwords somewhere is safer than having weak passwords or reusing them</strong></li>
-                                <li><strong>Password managers are a recommended practice</strong><br>
-                                    <em>These keep your passwords safe by encrypting them with one strong master password</em></li>
-                                <li><strong>Password managers will help you generate, store, and fill in passwords</strong></li>
-                                <li><strong>You could try a single very strong password that is altered systematically for different websites</strong><br>
-                                    <em>Be careful - if someone figures out your system, they could guess your other passwords</em></li>
-                                <li><strong>Even writing passwords down is better than having weak and reused passwords</strong></li>
-                                <li><strong>Check if your passwords have been exposed in data breaches</strong><br>
-                                    <em>Use haveibeenpwned.com to check if your email or passwords have been compromised, or use your password manager if it has these features</em></li>
+                                <li>It's very hard to remember many strong passwords!<br>
+                                    <em>You will usually have to make a compromise somewhere.</em></li>
+                                <li>Recording your passwords somewhere is safer than having weak passwords or reusing them.</li>
+                                <li>Password managers are a recommended practice.<br>
+                                    <em>These keep your passwords safe by encrypting them with one strong master password.</em></li>
+                                <li>Password managers will help you generate, store, and fill in passwords.</li>
+                                <li>You could try a single very strong password that is altered systematically for different websites.<br>
+                                    <em>Be careful - if someone figures out your system, they could guess your other passwords.</em></li>
+                                <li>Even writing passwords down is better than having weak and reused passwords.</li>
+                                <li>Check if your passwords have been exposed in data breaches.<br>
+                                    <em>Use haveibeenpwned.com to check if your email or passwords have been compromised, or use your password manager if it has these features.</em></li>
                             </ul>
                         </div>
                         <div class="card-actions">
@@ -393,12 +414,28 @@ active_page: learn
                         </div>
                     </div>
 
-                    <!-- Two Factor Authentication Card
+                    <!-- Two Factor Authentication Card -->
                     <div class="tip-card" id="two-factor">
                         <div class="card-content">
                             <h3>Two Factor Authentication</h3>
                             <ul class="learning-list">
-                                <li><strong>[Tip goes here]</strong></li>
+                                <li>Two Factor Authentication (2FA) protects your accounts even when attackers have the password.<br>
+                                    <em>Also called Multi Factor Authentication (MFA) or Two Step Authentication.</em>
+                                </li>
+                                <li>Setting up 2FA on important accounts makes them far safer.</li>
+                                <li>The logic: only you should have your device / only you have your unique biometrics.</li>
+                                <li>Usually done only occasionally, like if you are accessing from an unfamiliar device.</li>
+                                <li>Basic version: a code is texted to your phone number after entering your password.<br>
+                                    <em>Entering the code indicates that you have your phone (though this can be circumvented by determined hackers).</em>
+                                </li>
+                                <li>Do NOT share your codes with other people.</li>
+                                <li>Application-based 2FA is more secure.<br>
+                                    <em>These generate codes on your device instead, or produce notifications for you to confirm that it is you.</em>
+                                </li>
+                                <li>Do NOT click confirm on notifications if you did not initiate the process.</li>
+                                <li>When setting up 2FA, print or save any backup codes shown to you.<br>
+                                    <em>These let you bypass 2FA if you lose access to your device.</em>
+                                </li>
                             </ul>
                         </div>
                         <div class="card-actions">
@@ -406,10 +443,96 @@ active_page: learn
                                 Save Image
                             </button>
                         </div>
-                    </div> -->
+                    </div> 
                 </section>
 
-                <!-- Add more sections as needed -->
+                <!-- Sharing & Digital Legacy Section -->
+                <section class="tips-section" id="sharing">
+                    <h2>Sharing & Digital Legacy</h2>
+                    <p>Tips for safely sharing files and information, and planning for the future.</p>
+
+                    <!-- Sharing Files Card -->
+                    <div class="tip-card" id="sharing-files">
+                        <div class="card-content">
+                            <h3>Sharing Safely</h3>
+                            <h4>Files</h4>
+                            <ul class="learning-list">
+                                <li>Smaller files can be sent over email.<br>
+                                    <em>This is limited in terms of file size and security.</em></li>
+                                <li>Cloud storage can support easy sharing and control over who can access.</li>
+                                <li>Some devices support secure sharing directly with nearby devices.<br>
+                                    <em>E.g. Apple AirDrop, Android Nearby Share, Samsung Quick Share.</em></li>
+                                <li>USB sticks can be used to share files locally.<br>
+                                    <em>Thumb drives with encryption functionality are common and can limit risks.</em></li>
+                            </ul>
+                            <h4>Accounts & Information</h4>
+                            <ul class="learning-list">
+                                <li>Where possible, avoid sharing account logins and opt for individual accounts.<br>
+                                    <em>This is not possible for everything (e.g. some streaming services).</em></li>
+                                <li>Be careful about what you share online.<br>
+                                    <em>Attackers can gather data to make scams more believable.</em></li>
+                                <li>Most social media platforms allow users to limit who can view posts.</li>
+                                <li>Never share passwords or one-time codes with people you don't know and trust personally.<br>
+                                    <em>E.g. banks and customer service agents will never ask for these.</em></li>
+                            </ul>
+                        </div>
+                        <div class="card-actions">
+                            <button class="download-btn" onclick="downloadCard(this, 'sharing-files')">
+                                Save Image
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Digital Legacy Card -->
+                    <p id="digital-legacy"><em>The next section discusses planning for serious illness or death.</em></p>
+                    <p>Securing accounts and devices prevents others from accessing them — but what happens in the event of serious illness or death? Unfortunately, there is no one-size-fits-all solution at present, and UK law is underdeveloped. Often, being prepared for these scenarios realistically means making compromises to security or privacy.</p>
+                    <p>Making things easier for others when you die is a generous thing to do, but can be time-consuming and an emotional burden. If it seems like a lot, just take care of the most important things for you.</p>
+                    <div class="tip-card" id="digital-legacy-card">
+                        <div class="card-content">
+                            <h3>Digital Legacy</h3>
+                            <h4>Files</h4>
+                            <ul class="learning-list">
+                                <li>Some files with organisational or sentimental value can be shared while living.</li>
+                                <li>Consider backing up meaningful photos and memories to a shared folder on cloud storage, a hard drive, or printed media.</li>
+                                <li>For files you only want accessed after you have died:<br>
+                                        <em>- Consider facilitated transfer via Google's "Inactive Account Manager", Apple's "Legacy Contact" or Microsoft Onedrive's "Digital Legacy" options.</em>
+                                        <em>- Local backups to hard drives and USB sticks could allow storage in a secure place.</em>
+                                        <em>- Files could be kept under password protection with instructions for access securely kept elsewhere.</em>
+                                </li>
+                            </ul>
+
+                            <h4>Passwords</h4>
+                            <ul class="learning-list">
+                                <li>Set up individual accounts when sharing an account if possible.</li>
+                                <li>Be aware that, while common, using passwords to log into a deceased user's account is almost always against Terms of Service.<br>
+                                    <em>Some companies will delete or deactivate accounts if informed about the user's death.</em></li>
+                                <li>Using passwords may not always work, especially if logging in requires access to the deceased's mobile phone.</li>
+                                <li>NEVER use someone else's password to access or withdraw funds.</li>
+                                <li>If you own cryptocurrency and you are the only holder of the keys, failing to transfer these will mean the currency is lost forever.<br>
+                                    <em>NEVER put passwords or cryptocurrency keys in your will, as this will become public.</em></li>
+                                <li>Transferring passwords is made easier when using a password manager.<br>
+                                    <em>There is only one password to share, and some have "emergency contact" mechanisms.</em></li>
+                                <li>Transferring access to your email account can allow passwords to be reset.</li>
+                            </ul>
+
+                            <h4>Accounts & Devices</h4>
+                            <ul class="learning-list">
+                                <li>Facebook allows the nomination of a legacy contact and memorialises accounts.<br>
+                                    <em>This person has limited control over the account, including downloading shared content.</em></li>
+                                <li>Other major social media services only memorialise or delete accounts of deceased users. In most cases, accounts can usually be closed down by supplying proof of death.</li>
+                                <li>Digital content is almost always leased, not purchased, and can't be inherited or transferred.<br>
+                                    <em>This includes e-books, films, music, and video games on all major platforms.</em></li>
+                                <li>Sharing your PIN can be the only way to be sure that your mobile devices can be factory reset for sale or inheritance.</li>
+                            </ul>
+                        </div>
+                        <div class="card-actions">
+                            <button class="download-btn" onclick="downloadCard(this, 'digital-legacy-card')">
+                                Save Image
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
             </div><!-- End tips-content -->
         </div><!-- End tips-container -->
     </main>
