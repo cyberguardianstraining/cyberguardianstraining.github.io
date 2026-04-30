@@ -1,0 +1,7 @@
+# Add entries here to give presentations custom display titles.
+# 'file' must match the PDF filename exactly (including .pdf extension).
+# Any PDF in the presentations/ folder not listed here will use its filename as the title.
+#
+# Example:
+# - file: intro-to-cyber-safety.pdf
+#   title: "Introduction to Cyber Safety"

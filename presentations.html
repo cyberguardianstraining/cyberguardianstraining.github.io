@@ -1,0 +1,105 @@
+---
+layout: default
+title: Presentations
+active_page: presentations
+---
+
+<div class="page-header">
+    <h1>Presentations</h1>
+    <p class="page-description">These materials relate to training run by Northumbria University in a project funded by the Department of Science, Innovation and Technology (DSIT) for the Digital Inclusion Innovation Fund. They are free to use, but please let us know if you plan to use them by contacting James Nicholson at james.nicholson@northumbria.ac.uk. If you have questions about the materials or want to enquire about training, please also feel free to get in touch!</p>
+</div>
+
+<main>
+    {% assign pdf_files = site.static_files | where_exp: "file", "file.path contains '/presentations/'" | where_exp: "file", "file.extname == '.pdf'" %}
+
+    {% if pdf_files.size == 0 %}
+    <div class="content-section">
+        <p>No presentations are available yet. Add PDF files to the <code>presentations/</code> folder to make them appear here.</p>
+    </div>
+    {% else %}
+    <div class="demo-grid">
+        {% for file in pdf_files %}
+        {% assign manual_entry = nil %}
+        {% if site.data.presentations %}
+            {% assign manual_entry = site.data.presentations | where: "file", file.name | first %}
+        {% endif %}
+        {% if manual_entry %}
+            {% assign display_title = manual_entry.title %}
+        {% else %}
+            {% assign display_title = file.name | remove: '.pdf' | replace: '-', ' ' | replace: '_', ' ' %}
+        {% endif %}
+        <div class="demo-card">
+            <div class="demo-card-content">
+                <h2>{{ display_title }}</h2>
+            </div>
+            <div class="demo-actions">
+                <button class="run-btn" onclick="openPdfViewer('{{ file.path | relative_url }}', '{{ display_title | escape }}')" title="View this presentation">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    View
+                </button>
+                <a href="{{ file.path | relative_url }}" download="{{ file.name }}" class="download-btn" title="Download this presentation">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</main>
+
+<!-- PDF Viewer Modal -->
+<div class="pdf-viewer-overlay" id="pdfViewerOverlay">
+    <div class="pdf-viewer-container">
+        <div class="pdf-viewer-header">
+            <span class="pdf-viewer-title" id="pdfViewerTitle"></span>
+            <a href="" id="pdfViewerDownload" download class="download-btn pdf-viewer-download" title="Download this presentation">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Download
+            </a>
+            <button class="pdf-viewer-close" onclick="closePdfViewer()" aria-label="Close viewer">&times;</button>
+        </div>
+        <iframe id="pdfViewerFrame" src="" title="PDF Viewer"></iframe>
+    </div>
+</div>
+
+<script>
+    var overlay = document.getElementById('pdfViewerOverlay');
+
+    function openPdfViewer(path, title) {
+        document.getElementById('pdfViewerFrame').src = path;
+        document.getElementById('pdfViewerTitle').textContent = title;
+        var dl = document.getElementById('pdfViewerDownload');
+        dl.href = path;
+        dl.download = path.split('/').pop();
+        overlay.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closePdfViewer() {
+        overlay.classList.remove('is-open');
+        document.body.style.overflow = '';
+        // Delay clearing src so the close animation doesn't show a blank flash
+        setTimeout(function() {
+            document.getElementById('pdfViewerFrame').src = '';
+        }, 200);
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closePdfViewer();
+    });
+
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) closePdfViewer();
+    });
+</script>
