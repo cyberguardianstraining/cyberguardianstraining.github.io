@@ -1,7 +1,29 @@
-# Add entries here to give presentations custom display titles.
+# Add entries here to give presentations custom display titles and descriptions.
 # 'file' must match the PDF filename exactly (including .pdf extension).
-# Any PDF in the presentations/ folder not listed here will use its filename as the title.
-#
-# Example:
-# - file: intro-to-cyber-safety.pdf
-#   title: "Introduction to Cyber Safety"
+# 'category' must be either 'guidance' or 'presentations'.
+# Any PDF in the presentations/ folder not listed here will appear under 'presentations'.
+
+- file: "Train The Trainer Model - A Practical Guide.pdf"
+  title: "Train The Trainer Model: A Practical Guide"
+  category: guidance
+  description: "A reference guide for the delivery of peer-to-peer online safety training using the train the trainer model."
+
+- file: "Authentication.pdf"
+  title: "Authentication"
+  category: presentations
+  description: "Covers how to keep accounts safe through strong and unique passwords, two factor authentication, and sensible password management strategies."
+
+- file: "Spotting Trustworthy Information.pdf"
+  title: "Spotting Trustworthy Information and Avoiding Scams"
+  category: presentations
+  description: "Introduces techniques for evaluating the reliability of online information and avoiding scams"
+
+- file: "Artificial Intelligence (AI).pdf"
+  title: "Artificial Intelligence (AI)"
+  category: presentations
+  description: "Introduces what artificial intelligence (AI) is and how it is used in everyday applications. Covers common AI tools, their capabilities, and considerations around emerging benefits and harms."
+
+- file: "Using Technology Safely.pdf"
+  title: "Using Technology Safely"
+  category: presentations
+  description: "Covers practical steps for staying safe when using devices and the internet. Topics include device security, an introduction to malware, risks of public WiFi, and spotting unsafe URLs and email addresses"

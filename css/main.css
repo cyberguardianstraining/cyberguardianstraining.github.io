@@ -243,6 +243,20 @@ main {
     height: 18px;
 }
 
+/* Training page sections */
+.training-section {
+    margin-bottom: 3rem;
+}
+
+.section-heading {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
 /* Content pages styling */
 .content-section {
     max-width: 900px;

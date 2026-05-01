@@ -12,46 +12,96 @@ active_page: training
 <main>
     {% assign pdf_files = site.static_files | where_exp: "file", "file.path contains '/presentations/'" | where_exp: "file", "file.extname == '.pdf'" %}
 
-    {% if pdf_files.size == 0 %}
-    <div class="content-section">
-        <p>No presentations are available yet. Add PDF files to the <code>presentations/</code> folder to make them appear here.</p>
-    </div>
-    {% else %}
-    <div class="demo-grid">
+    <section class="training-section">
+        <h2 class="section-heading">Guidance</h2>
+        {% assign guidance_files = "" | split: "" %}
         {% for file in pdf_files %}
-        {% assign manual_entry = nil %}
-        {% if site.data.presentations %}
-            {% assign manual_entry = site.data.presentations | where: "file", file.name | first %}
-        {% endif %}
-        {% if manual_entry %}
-            {% assign display_title = manual_entry.title %}
-        {% else %}
-            {% assign display_title = file.name | remove: '.pdf' | replace: '-', ' ' | replace: '_', ' ' %}
-        {% endif %}
-        <div class="demo-card">
-            <div class="demo-card-content">
-                <h2>{{ display_title }}</h2>
-            </div>
-            <div class="demo-actions">
-                <button class="run-btn" onclick="openPdfViewer('{{ file.path | relative_url }}', '{{ display_title | escape }}')" title="View this presentation">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                    </svg>
-                    View
-                </button>
-                <a href="{{ file.path | relative_url }}" download="{{ file.name }}" class="download-btn" title="Download this presentation">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                    Download
-                </a>
-            </div>
-        </div>
+            {% assign entry = nil %}
+            {% if site.data.presentations %}
+                {% assign entry = site.data.presentations | where: "file", file.name | first %}
+            {% endif %}
+            {% if entry and entry.category == "guidance" %}
+                {% assign guidance_files = guidance_files | push: file %}
+            {% endif %}
         {% endfor %}
-    </div>
-    {% endif %}
+        {% if guidance_files.size == 0 %}
+        <div class="content-section">
+            <p>No guidance documents are available yet.</p>
+        </div>
+        {% else %}
+        <div class="demo-grid">
+            {% for file in guidance_files %}
+            {% assign entry = site.data.presentations | where: "file", file.name | first %}
+            {% assign display_title = entry.title | default: file.name | remove: '.pdf' | replace: '-', ' ' | replace: '_', ' ' %}
+            <div class="demo-card">
+                <div class="demo-card-content">
+                    <h2>{{ display_title }}</h2>
+                    {% if entry.description %}<p class="demo-description">{{ entry.description }}</p>{% endif %}
+                </div>
+                <div class="demo-actions">
+                    <button class="run-btn" onclick="openPdfViewer('{{ file.path | relative_url }}', '{{ display_title | escape }}')" title="View this document">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        View
+                    </button>
+                    <a href="{{ file.path | relative_url }}" download="{{ file.name }}" class="download-btn" title="Download this document">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </section>
+
+    <section class="training-section">
+        <h2 class="section-heading">Presentations</h2>
+        {% if pdf_files.size == 0 %}
+        <div class="content-section">
+            <p>No presentations are available yet. Add PDF files to the <code>presentations/</code> folder to make them appear here.</p>
+        </div>
+        {% else %}
+        <div class="demo-grid">
+            {% for file in pdf_files %}
+            {% assign entry = nil %}
+            {% if site.data.presentations %}
+                {% assign entry = site.data.presentations | where: "file", file.name | first %}
+            {% endif %}
+            {% if entry == nil or entry.category != "guidance" %}
+            {% assign display_title = entry.title | default: file.name | remove: '.pdf' | replace: '-', ' ' | replace: '_', ' ' %}
+            <div class="demo-card">
+                <div class="demo-card-content">
+                    <h2>{{ display_title }}</h2>
+                    {% if entry.description %}<p class="demo-description">{{ entry.description }}</p>{% endif %}
+                </div>
+                <div class="demo-actions">
+                    <button class="run-btn" onclick="openPdfViewer('{{ file.path | relative_url }}', '{{ display_title | escape }}')" title="View this presentation">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        View
+                    </button>
+                    <a href="{{ file.path | relative_url }}" download="{{ file.name }}" class="download-btn" title="Download this presentation">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </section>
 </main>
 
 <!-- PDF Viewer Modal -->
