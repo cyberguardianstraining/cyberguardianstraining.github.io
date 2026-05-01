@@ -11,5 +11,3 @@ markdown: kramdown
 include:
   - _includes
   - _layouts
-exclude:
-  - "presentations/*.pptx"

@@ -75,6 +75,8 @@ active_page: training
             {% endif %}
             {% if entry == nil or entry.category != "guidance" %}
             {% assign display_title = entry.title | default: file.name | remove: '.pdf' | replace: '-', ' ' | replace: '_', ' ' %}
+            {% assign pptx_path = file.path | replace: '.pdf', '.pptx' %}
+            {% assign pptx_name = file.name | replace: '.pdf', '.pptx' %}
             <div class="demo-card">
                 <div class="demo-card-content">
                     <h2>{{ display_title }}</h2>
@@ -87,13 +89,13 @@ active_page: training
                         </svg>
                         View
                     </button>
-                    <a href="{{ file.path | relative_url }}" download="{{ file.name }}" class="download-btn" title="Download this presentation">
+                    <a href="{{ pptx_path | relative_url }}" download="{{ pptx_name }}" class="download-btn" title="Download this presentation">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="7 10 12 15 17 10"></polyline>
                             <line x1="12" y1="15" x2="12" y2="3"></line>
                         </svg>
-                        Download
+                        Download .pptx
                     </a>
                 </div>
             </div>
@@ -127,6 +129,10 @@ active_page: training
     var overlay = document.getElementById('pdfViewerOverlay');
 
     function openPdfViewer(path, title) {
+        if (window.innerWidth < 768) {
+            window.open(path, '_blank');
+            return;
+        }
         document.getElementById('pdfViewerFrame').src = path;
         document.getElementById('pdfViewerTitle').textContent = title;
         var dl = document.getElementById('pdfViewerDownload');
